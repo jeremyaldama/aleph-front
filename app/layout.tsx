@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Image from "next/image";
+import Link from "next/link";
 import SessionActions from "@/components/auth/SessionActions";
 import "./globals.css";
 
@@ -30,6 +32,22 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-7xl items-center px-6 py-3 lg:px-10">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <Image
+                src="/bodegagentic-logo.svg"
+                alt="Bodegagentic logo"
+                width={46}
+                height={46}
+                priority
+              />
+              <span className="text-2xl font-semibold tracking-tight text-slate-950">
+                Bodegagentic
+              </span>
+            </Link>
+          </div>
+        </header>
         <SessionActions />
         {children}
       </body>

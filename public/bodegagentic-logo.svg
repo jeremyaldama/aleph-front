@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Bodegagentic logo</title>
+  <desc id="desc">Circular gradient mark with a market storefront and circuit accents.</desc>
+  <defs>
+    <linearGradient id="ringGradient" x1="32" y1="220" x2="224" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b3dcb"/>
+      <stop offset="0.55" stop-color="#3147ff"/>
+      <stop offset="1" stop-color="#cb22f5"/>
+    </linearGradient>
+    <linearGradient id="shopGradient" x1="64" y1="184" x2="196" y2="84" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f47e6"/>
+      <stop offset="0.55" stop-color="#4a42f9"/>
+      <stop offset="1" stop-color="#bf1ef2"/>
+    </linearGradient>
+    <linearGradient id="awningGradient" x1="56" y1="118" x2="198" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1280ff"/>
+      <stop offset="1" stop-color="#b31cff"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M128 22c-58.54 0-106 47.46-106 106s47.46 106 106 106c30.2 0 57.44-12.64 76.73-32.92" fill="none" stroke="url(#ringGradient)" stroke-width="14" stroke-linecap="round"/>
+
+  <circle cx="214" cy="57" r="10" fill="none" stroke="url(#ringGradient)" stroke-width="8"/>
+  <circle cx="224" cy="88" r="9" fill="none" stroke="url(#ringGradient)" stroke-width="7"/>
+  <path d="M198 70l22-10M205 99l20-6" fill="none" stroke="url(#ringGradient)" stroke-width="6" stroke-linecap="round"/>
+
+  <path d="M64 111l64-30 64 30H64z" fill="url(#shopGradient)"/>
+  <rect x="56" y="119" width="144" height="34" rx="10" fill="url(#awningGradient)"/>
+
+  <path d="M68 157h120v36H68z" fill="url(#shopGradient)"/>
+  <path d="M92 157h20v36H92zM144 157h20v36h-20z" fill="#f6f8ff"/>
+  <path d="M74 192h108" stroke="#f6f8ff" stroke-width="7"/>
+</svg>
