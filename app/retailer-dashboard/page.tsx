@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import type { RetailerDashboardProductResponseDto } from "@/generated/aleph-be";
+import type {
+  MerchantOrderCommitmentResponseDto,
+  PurchasePoolResponseDto,
+  RetailerDashboardProductResponseDto,
+} from "@/generated/aleph-be";
 import {
   aggregatePool,
   commitRetailerOrderWithAutoVerify,
@@ -75,6 +79,10 @@ function RetailerDashboardContent() {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>("");
+  const [latestPoolResponse, setLatestPoolResponse] =
+    useState<PurchasePoolResponseDto | null>(null);
+  const [latestCommitmentResponse, setLatestCommitmentResponse] =
+    useState<MerchantOrderCommitmentResponseDto | null>(null);
 
   const selectedProduct = useMemo(
     () => products.find((product) => product.sku === selectedSku) ?? null,
@@ -144,9 +152,11 @@ function RetailerDashboardContent() {
 
     const poolName = `${selectedProduct.name} - Retailer Pool`;
     let poolId = `pool-local-${Date.now()}`;
+    let createdPool: PurchasePoolResponseDto | null = null;
+    let commitmentResponse: MerchantOrderCommitmentResponseDto | null = null;
 
     try {
-      const createdPool = await createPurchasePool(
+      createdPool = await createPurchasePool(
         {
           name: poolName,
           allowedMerchants: [retailerId, ...SIMULATED_RETAILERS],
@@ -154,6 +164,7 @@ function RetailerDashboardContent() {
         accessToken,
       );
       poolId = createdPool.poolId;
+      setLatestPoolResponse(createdPool);
       setStatusMessage(
         "Pool created on backend. Now open for retailer applications.",
       );
@@ -164,7 +175,7 @@ function RetailerDashboardContent() {
     }
 
     try {
-      await commitRetailerOrderWithAutoVerify(
+      commitmentResponse = await commitRetailerOrderWithAutoVerify(
         {
           poolId,
           merchantId: retailerId,
@@ -173,6 +184,10 @@ function RetailerDashboardContent() {
           unitPrice: selectedProduct.unitPrice,
         },
         accessToken,
+      );
+      setLatestCommitmentResponse(commitmentResponse);
+      setStatusMessage(
+        `Commitment recorded (${commitmentResponse.commitmentId}). Next step: click \"Simulate Other Retailers Applying\" to move this pool toward threshold.`,
       );
     } catch (error) {
       const fallbackMessage =
@@ -334,6 +349,26 @@ function RetailerDashboardContent() {
           <p className="mb-6 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700">
             {statusMessage}
           </p>
+        )}
+
+        {(latestPoolResponse || latestCommitmentResponse) && (
+          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            <p className="font-semibold">Latest backend event</p>
+            {latestPoolResponse && (
+              <p className="mt-1">
+                Pool created:{" "}
+                <span className="font-mono">{latestPoolResponse.poolId}</span>
+              </p>
+            )}
+            {latestCommitmentResponse && (
+              <p className="mt-1">
+                Commitment recorded:{" "}
+                <span className="font-mono">
+                  {latestCommitmentResponse.commitmentId}
+                </span>
+              </p>
+            )}
+          </div>
         )}
 
         <div className="grid gap-6 lg:grid-cols-[1.35fr_0.95fr]">
