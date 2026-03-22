@@ -206,3 +206,13 @@ export function saveWorkflowPoolState(state: WorkflowPoolState) {
 
   window.localStorage.setItem(WORKFLOW_POOL_STORAGE_KEY, JSON.stringify(state));
 }
+
+export function clearLocalSession() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem("aleph_access_token");
+  window.localStorage.removeItem("aleph_user");
+  window.localStorage.removeItem(WORKFLOW_POOL_STORAGE_KEY);
+}
