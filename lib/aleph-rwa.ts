@@ -22,6 +22,16 @@ function getRwaApi(accessToken?: string) {
   );
 }
 
+function getAuthHeaders(accessToken?: string) {
+  if (!accessToken) {
+    return undefined;
+  }
+
+  return {
+    Authorization: `Bearer ${accessToken}`,
+  };
+}
+
 export const MOCK_RETAILER_PRODUCTS: RetailerDashboardProductResponseDto[] = [
   {
     sku: "cooking-oil-5l",
@@ -126,7 +136,9 @@ export async function createPurchasePool(
   accessToken?: string,
 ): Promise<PurchasePoolResponseDto> {
   const api = getRwaApi(accessToken);
-  const { data } = await api.rwaControllerCreatePool(payload);
+  const { data } = await api.rwaControllerCreatePool(payload, {
+    headers: getAuthHeaders(accessToken),
+  });
   return data;
 }
 
@@ -135,7 +147,9 @@ export async function commitRetailerOrder(
   accessToken?: string,
 ) {
   const api = getRwaApi(accessToken);
-  const { data } = await api.rwaControllerCommitOrder(payload);
+  const { data } = await api.rwaControllerCommitOrder(payload, {
+    headers: getAuthHeaders(accessToken),
+  });
   return data;
 }
 
@@ -214,7 +228,14 @@ async function verifyMerchantForCommit(
     },
   };
 
-  await api.rwaControllerVerifyMerchant(payload);
+  await api.rwaControllerVerifyMerchant(payload, {
+    headers: getAuthHeaders(accessToken),
+  });
+}
+
+function isMissingBearerTokenError(error: unknown) {
+  const message = extractErrorMessage(error).toLowerCase();
+  return message.includes("missing bearer token");
 }
 
 export async function commitRetailerOrderWithAutoVerify(
@@ -224,6 +245,10 @@ export async function commitRetailerOrderWithAutoVerify(
   try {
     return await commitRetailerOrder(payload, accessToken);
   } catch (error) {
+    if (isMissingBearerTokenError(error)) {
+      throw new Error("Missing bearer token. Please log in again.");
+    }
+
     if (!isMissingMerchantError(error)) {
       throw error;
     }
@@ -238,7 +263,12 @@ export async function aggregatePool(
   accessToken?: string,
 ): Promise<AggregatedOrderResponseDto> {
   const api = getRwaApi(accessToken);
-  const { data } = await api.rwaControllerAggregate({ poolId });
+  const { data } = await api.rwaControllerAggregate(
+    { poolId },
+    {
+      headers: getAuthHeaders(accessToken),
+    },
+  );
   return data;
 }
 
@@ -247,7 +277,12 @@ export async function tokenizeAggregatedOrder(
   accessToken?: string,
 ): Promise<AggregatedOrderResponseDto> {
   const api = getRwaApi(accessToken);
-  const { data } = await api.rwaControllerTokenize({ orderId });
+  const { data } = await api.rwaControllerTokenize(
+    { orderId },
+    {
+      headers: getAuthHeaders(accessToken),
+    },
+  );
   return data;
 }
 

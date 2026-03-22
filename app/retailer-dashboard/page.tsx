@@ -127,6 +127,14 @@ function RetailerDashboardContent() {
     setStatusMessage("");
 
     const accessToken = getStoredAccessToken();
+    if (!accessToken) {
+      setActionLoading(false);
+      setStatusMessage(
+        "Missing bearer token. Please log in again before creating a pool.",
+      );
+      return;
+    }
+
     const retailerId = getStoredRetailerId();
     const minimumThreshold = selectedProduct.minimumOrderQuantity * 10;
     const initialQuantity = Math.max(
