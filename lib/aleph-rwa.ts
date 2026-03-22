@@ -256,7 +256,8 @@ export async function commitRetailerOrderWithAutoVerify(
       throw error;
     }
 
-    await verifyMerchantForCommit(payload.merchantId, accessToken);
+    const merchantIdToVerify = payload.merchantId ?? getStoredRetailerId();
+    await verifyMerchantForCommit(merchantIdToVerify, accessToken);
     return commitRetailerOrder(payload, accessToken);
   }
 }
