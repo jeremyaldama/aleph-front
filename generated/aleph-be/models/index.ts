@@ -14,6 +14,8 @@ export * from './prepare-bridge-dto';
 export * from './purchase-pool-response-dto';
 export * from './record-repayment-dto';
 export * from './repayment-record-dto';
+export * from './retailer-dashboard-product-response-dto';
+export * from './retailer-dashboard-products-response-dto';
 export * from './rwa-lifecycle-status-response-dto';
 export * from './rwa-log-entry-response-dto';
 export * from './settlement-record-dto';

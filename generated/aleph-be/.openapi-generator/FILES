@@ -1,6 +1,5 @@
 .gitignore
 .npmignore
-.openapi-generator-ignore
 api.ts
 api/app-api.ts
 api/auth-api.ts
@@ -26,6 +25,8 @@ docs/PrepareBridgeDto.md
 docs/PurchasePoolResponseDto.md
 docs/RecordRepaymentDto.md
 docs/RepaymentRecordDto.md
+docs/RetailerDashboardProductResponseDto.md
+docs/RetailerDashboardProductsResponseDto.md
 docs/RwaApi.md
 docs/RwaLifecycleStatusResponseDto.md
 docs/RwaLogEntryResponseDto.md
@@ -57,6 +58,8 @@ models/prepare-bridge-dto.ts
 models/purchase-pool-response-dto.ts
 models/record-repayment-dto.ts
 models/repayment-record-dto.ts
+models/retailer-dashboard-product-response-dto.ts
+models/retailer-dashboard-products-response-dto.ts
 models/rwa-lifecycle-status-response-dto.ts
 models/rwa-log-entry-response-dto.ts
 models/settlement-record-dto.ts

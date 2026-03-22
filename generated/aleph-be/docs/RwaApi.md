@@ -10,6 +10,7 @@ All URIs are relative to *http://localhost*
 |[**rwaControllerFinance**](#rwacontrollerfinance) | **POST** /rwa/orders/finance | Register financing terms for an aggregated order|
 |[**rwaControllerGetOrder**](#rwacontrollergetorder) | **GET** /rwa/orders/{orderId} | Get one aggregated order by id|
 |[**rwaControllerGetPool**](#rwacontrollergetpool) | **GET** /rwa/pools/{poolId} | Get one purchase pool by id|
+|[**rwaControllerGetRetailerDashboardProducts**](#rwacontrollergetretailerdashboardproducts) | **GET** /rwa/retailer/products | Retailer dashboard first page: list products (mocked)|
 |[**rwaControllerListOrders**](#rwacontrollerlistorders) | **GET** /rwa/orders | List all aggregated orders|
 |[**rwaControllerLogs**](#rwacontrollerlogs) | **GET** /rwa/logs | Get recent RWA lifecycle logs|
 |[**rwaControllerPrepareBridge**](#rwacontrollerpreparebridge) | **POST** /rwa/orders/bridge | Prepare order asset for bridge interoperability to public Avalanche|
@@ -310,6 +311,50 @@ const { status, data } = await apiInstance.rwaControllerGetPool(
 ### Authorization
 
 No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** |  |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **rwaControllerGetRetailerDashboardProducts**
+> RetailerDashboardProductsResponseDto rwaControllerGetRetailerDashboardProducts()
+
+Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.
+
+### Example
+
+```typescript
+import {
+    RwaApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RwaApi(configuration);
+
+const { status, data } = await apiInstance.rwaControllerGetRetailerDashboardProducts();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**RetailerDashboardProductsResponseDto**
+
+### Authorization
+
+[bearer](../README.md#bearer)
 
 ### HTTP request headers
 

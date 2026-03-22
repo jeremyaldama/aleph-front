@@ -1,174 +1,551 @@
-export default function RetailerDashboard() {
-  return (
-    <main className="relative min-h-screen bg-[#f7fafc] text-slate-900">
-      <div className="mx-auto w-full max-w-7xl px-6 py-10 lg:px-10">
-        {/* Purpose header */}
-        <div className="mb-10 border-b border-slate-200 pb-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-            My Tokenized Inventory
-          </h1>
-          <p className="mt-2 text-slate-600">
-            Monitor your portfolio of group purchases, tokenized holdings, and
-            pending deliveries. Manage claims, redeem for physical goods, or
-            pledge additional demand.
-          </p>
-        </div>
+"use client";
 
-        {/* KPI Cards */}
-        <div className="mb-10 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_16px_-30px_rgba(15,23,42,0.5)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
-              Total Savings Achieved
-            </p>
-            <p className="mt-2 text-4xl font-bold text-emerald-600">$18.7K</p>
-            <p className="mt-1 text-sm text-emerald-600">
-              +12.3% vs previous quarter
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_16px_-30px_rgba(15,23,42,0.5)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
-              Active Holdings
-            </p>
-            <p className="mt-2 text-3xl font-bold text-slate-950">8,472</p>
-            <p className="mt-1 text-sm text-slate-600">
-              tokens | $124.3K value
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_16px_-30px_rgba(15,23,42,0.5)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
-              Pending Deliveries
-            </p>
-            <p className="mt-2 text-3xl font-bold text-slate-950">4</p>
-            <div className="mt-2 flex items-center gap-2">
-              <span className="inline-flex rounded-full bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-700">
-                Ships today
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import type { RetailerDashboardProductResponseDto } from "@/generated/aleph-be";
+import {
+  aggregatePool,
+  commitRetailerOrder,
+  createPurchasePool,
+  getRetailerDashboardProducts,
+  getStoredAccessToken,
+  getStoredRetailerId,
+  loadWorkflowPoolState,
+  saveWorkflowPoolState,
+  tokenizeAggregatedOrder,
+  WORKFLOW_POOL_STORAGE_KEY,
+  type WorkflowParticipant,
+  type WorkflowPoolState,
+} from "@/lib/aleph-rwa";
+
+const SIMULATED_RETAILERS = [
+  "merchant-201",
+  "merchant-309",
+  "merchant-441",
+  "merchant-512",
+  "merchant-690",
+];
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: value < 10 ? 2 : 0,
+  }).format(value);
+}
+
+function getPoolProgress(pool: WorkflowPoolState | null) {
+  if (!pool) {
+    return 0;
+  }
+
+  return Math.min(
+    100,
+    Math.round((pool.pledgedQuantity / pool.threshold) * 100),
+  );
+}
+
+function getStageLabel(pool: WorkflowPoolState | null) {
+  if (!pool) {
+    return "No active pool";
+  }
+
+  if (pool.stage === "tokenized") {
+    return "Tokenized and allocated";
+  }
+
+  if (pool.stage === "threshold_reached") {
+    return "Threshold reached. Ready for supplier dispatch";
+  }
+
+  return "Open for retailer applications";
+}
+
+export default function RetailerDashboard() {
+  const searchParams = useSearchParams();
+  const skuFromQuery = searchParams.get("sku");
+
+  const [products, setProducts] = useState<
+    RetailerDashboardProductResponseDto[]
+  >([]);
+  const [selectedSku, setSelectedSku] = useState<string>("");
+  const [desiredQuantity, setDesiredQuantity] = useState<number>(0);
+  const [poolState, setPoolState] = useState<WorkflowPoolState | null>(null);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string>("");
+
+  const selectedProduct = useMemo(
+    () => products.find((product) => product.sku === selectedSku) ?? null,
+    [products, selectedSku],
+  );
+
+  const poolProgress = useMemo(() => getPoolProgress(poolState), [poolState]);
+
+  useEffect(() => {
+    async function loadProducts() {
+      setLoadingProducts(true);
+      const accessToken = getStoredAccessToken();
+      const fetchedProducts = await getRetailerDashboardProducts(accessToken);
+      setProducts(fetchedProducts);
+
+      const existingPool = loadWorkflowPoolState();
+      if (existingPool) {
+        setPoolState(existingPool);
+        setSelectedSku(existingPool.sku);
+        const matched = fetchedProducts.find(
+          (product) => product.sku === existingPool.sku,
+        );
+        setDesiredQuantity(matched?.minimumOrderQuantity ?? 0);
+      } else if (skuFromQuery) {
+        setSelectedSku(skuFromQuery);
+        const matched = fetchedProducts.find(
+          (product) => product.sku === skuFromQuery,
+        );
+        setDesiredQuantity(matched?.minimumOrderQuantity ?? 0);
+      } else {
+        const firstSku = fetchedProducts[0]?.sku ?? "";
+        if (firstSku) {
+          setSelectedSku(firstSku);
+          setDesiredQuantity(fetchedProducts[0]?.minimumOrderQuantity ?? 0);
+        }
+      }
+
+      setLoadingProducts(false);
+    }
+
+    void loadProducts();
+  }, [skuFromQuery]);
+
+  async function handleCreatePool() {
+    if (!selectedProduct) {
+      return;
+    }
+
+    setActionLoading(true);
+    setStatusMessage("");
+
+    const accessToken = getStoredAccessToken();
+    const retailerId = getStoredRetailerId();
+    const minimumThreshold = selectedProduct.minimumOrderQuantity * 10;
+    const initialQuantity = Math.max(
+      selectedProduct.minimumOrderQuantity,
+      desiredQuantity,
+    );
+
+    const poolName = `${selectedProduct.name} - Retailer Pool`;
+    let poolId = `pool-local-${Date.now()}`;
+
+    try {
+      const createdPool = await createPurchasePool(
+        {
+          name: poolName,
+          allowedMerchants: [retailerId, ...SIMULATED_RETAILERS],
+        },
+        accessToken,
+      );
+      poolId = createdPool.poolId;
+      setStatusMessage(
+        "Pool created on backend. Now open for retailer applications.",
+      );
+    } catch {
+      setStatusMessage(
+        "Pool could not be created on backend right now. UI switched to local simulation mode.",
+      );
+    }
+
+    try {
+      await commitRetailerOrder(
+        {
+          poolId,
+          merchantId: retailerId,
+          sku: selectedProduct.sku,
+          quantity: initialQuantity,
+          unitPrice: selectedProduct.unitPrice,
+        },
+        accessToken,
+      );
+    } catch {
+      // Keep the UI flow active even if commitment API is unavailable.
+    }
+
+    const nextPool: WorkflowPoolState = {
+      poolId,
+      poolName,
+      sku: selectedProduct.sku,
+      productName: selectedProduct.name,
+      threshold: minimumThreshold,
+      pledgedQuantity: initialQuantity,
+      stage:
+        initialQuantity >= minimumThreshold ? "threshold_reached" : "pool_open",
+      supplierName: selectedProduct.supplierName,
+      participants: [
+        {
+          merchantId: retailerId,
+          quantity: initialQuantity,
+        },
+      ],
+    };
+
+    setPoolState(nextPool);
+    saveWorkflowPoolState(nextPool);
+    setActionLoading(false);
+  }
+
+  function handleSimulateApplications() {
+    if (!poolState || poolState.stage === "tokenized") {
+      return;
+    }
+
+    let pledgedQuantity = poolState.pledgedQuantity;
+    const participants: WorkflowParticipant[] = [...poolState.participants];
+
+    for (const merchantId of SIMULATED_RETAILERS) {
+      if (
+        participants.some(
+          (participant) => participant.merchantId === merchantId,
+        )
+      ) {
+        continue;
+      }
+
+      const simulatedQuantity = Math.ceil(
+        poolState.threshold * (0.08 + Math.random() * 0.14),
+      );
+      participants.push({ merchantId, quantity: simulatedQuantity });
+      pledgedQuantity += simulatedQuantity;
+
+      if (pledgedQuantity >= poolState.threshold) {
+        break;
+      }
+    }
+
+    const nextState: WorkflowPoolState = {
+      ...poolState,
+      pledgedQuantity,
+      participants,
+      stage:
+        pledgedQuantity >= poolState.threshold
+          ? "threshold_reached"
+          : "pool_open",
+    };
+
+    setPoolState(nextState);
+    saveWorkflowPoolState(nextState);
+
+    setStatusMessage(
+      pledgedQuantity >= poolState.threshold
+        ? "Threshold reached. Supplier can now dispatch this pool and trigger tokenization."
+        : "More retailers still need to apply before threshold is reached.",
+    );
+  }
+
+  async function handleDispatchAndTokenize() {
+    if (!poolState || poolState.stage !== "threshold_reached") {
+      return;
+    }
+
+    setActionLoading(true);
+
+    const accessToken = getStoredAccessToken();
+    let orderId = poolState.orderId ?? `order-local-${Date.now()}`;
+
+    try {
+      const aggregatedOrder = await aggregatePool(
+        poolState.poolId,
+        accessToken,
+      );
+      orderId = aggregatedOrder.orderId;
+    } catch {
+      // Keep local fallback if aggregation endpoint is unavailable.
+    }
+
+    try {
+      const tokenizedOrder = await tokenizeAggregatedOrder(
+        orderId,
+        accessToken,
+      );
+      orderId = tokenizedOrder.orderId;
+      setStatusMessage(
+        "Supplier dispatch confirmed and tokenization registered on backend.",
+      );
+    } catch {
+      setStatusMessage(
+        "Dispatch/tokenization endpoint is unavailable. UI moved forward with local tokenization state.",
+      );
+    }
+
+    const eta = new Date();
+    eta.setDate(eta.getDate() + 6);
+
+    const nextState: WorkflowPoolState = {
+      ...poolState,
+      stage: "tokenized",
+      orderId,
+      tokenizedAt: new Date().toISOString(),
+      estimatedDelivery: eta.toISOString(),
+    };
+
+    setPoolState(nextState);
+    saveWorkflowPoolState(nextState);
+    setActionLoading(false);
+  }
+
+  function handleResetPool() {
+    setPoolState(null);
+    window.localStorage.removeItem(WORKFLOW_POOL_STORAGE_KEY);
+    setStatusMessage("Workflow reset. You can start a new pool.");
+  }
+
+  return (
+    <main className="min-h-screen bg-[#f7fafc] text-slate-900">
+      <section className="mx-auto w-full max-w-7xl px-6 py-10 lg:px-10">
+        <header className="mb-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_14px_32px_-28px_rgba(15,23,42,0.7)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-700">
+            Retailer First Step
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+            Products Available for Retailer Pools
+          </h1>
+          <p className="mt-2 max-w-3xl text-sm text-slate-600">
+            First you select a product, then create a pool, then other retailers
+            apply, then supplier dispatches once threshold is reached, and
+            finally each store receives its tokenized share.
+          </p>
+        </header>
+
+        {statusMessage && (
+          <p className="mb-6 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700">
+            {statusMessage}
+          </p>
+        )}
+
+        <div className="grid gap-6 lg:grid-cols-[1.35fr_0.95fr]">
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-slate-950">
+                Product Catalog
+              </h2>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                {products.length} products
               </span>
             </div>
-          </div>
-        </div>
 
-        {/* Tabs & Table */}
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_12px_34px_-28px_rgba(15,23,42,0.7)]">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <div className="flex gap-6 text-sm font-medium">
-              <button className="border-b-2 border-slate-900 pb-2 text-slate-900">
-                In Transit
-              </button>
-              <button className="pb-2 text-slate-600 hover:text-slate-900">
-                Pledged / Available
-              </button>
-              <button className="pb-2 text-slate-600 hover:text-slate-900">
-                Redeemed
-              </button>
-            </div>
-          </div>
+            {loadingProducts ? (
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+                Loading retailer product feed...
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {products.map((product) => {
+                  const isSelected = selectedSku === product.sku;
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">
-                    Asset / Campaign
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">
-                    Token Balance
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">
-                    Demand Progress
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">
-                    Unit Price
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">
-                    Est. Delivery
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {[
-                  {
-                    asset: "Fresh Produce - Tomatoes (SKU: TOM-2024-Q1)",
-                    tokens: "1,240",
-                    progress: "87%",
-                    price: "$0.68 (↓12% vs MSRP)",
-                    delivery: "Mar 28",
-                  },
-                  {
-                    asset: "Cold Storage - Dairy Mix (SKU: DAI-2024-Q1)",
-                    tokens: "2,847",
-                    progress: "73%",
-                    price: "$1.24 (↓8% vs MSRP)",
-                    delivery: "Apr 5",
-                  },
-                  {
-                    asset: "Frozen Proteins - Chicken (SKU: CHK-2024-Q1)",
-                    tokens: "4,385",
-                    progress: "91%",
-                    price: "$2.44 (↓15% vs MSRP)",
-                    delivery: "Apr 12",
-                  },
-                ].map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 font-medium text-slate-900">
-                      {item.asset}
-                    </td>
-                    <td className="px-6 py-4 text-slate-900">{item.tokens}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-24 rounded-full bg-slate-200">
-                          <div
-                            className="h-full rounded-full bg-emerald-500"
-                            style={{ width: item.progress }}
-                          />
+                  return (
+                    <article
+                      key={product.sku}
+                      className={`rounded-2xl border bg-white p-5 shadow-[0_10px_24px_-28px_rgba(15,23,42,0.7)] transition ${
+                        isSelected
+                          ? "border-sky-400 ring-2 ring-sky-100"
+                          : "border-slate-200"
+                      }`}
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+                        {product.category}
+                      </p>
+                      <h3 className="mt-2 text-lg font-semibold text-slate-950">
+                        {product.name}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-600">
+                        Supplier: {product.supplierName}
+                      </p>
+
+                      <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        <div className="rounded-lg bg-slate-50 p-3">
+                          <p className="text-slate-500">Unit Price</p>
+                          <p className="font-semibold text-slate-900">
+                            {formatCurrency(product.unitPrice)} / {product.unit}
+                          </p>
                         </div>
-                        <span className="text-xs font-semibold text-slate-700">
-                          {item.progress}
+                        <div className="rounded-lg bg-slate-50 p-3">
+                          <p className="text-slate-500">MOQ</p>
+                          <p className="font-semibold text-slate-900">
+                            {product.minimumOrderQuantity}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedSku(product.sku);
+                            setDesiredQuantity(product.minimumOrderQuantity);
+                          }}
+                          className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+                        >
+                          Use in Pool Builder
+                        </button>
+                        <Link
+                          href={`/product-detail?sku=${encodeURIComponent(product.sku)}`}
+                          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:border-slate-400"
+                        >
+                          View Details
+                        </Link>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          <aside className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_-28px_rgba(15,23,42,0.7)]">
+              <h2 className="text-lg font-semibold text-slate-950">
+                Pool Builder
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                {getStageLabel(poolState)}
+              </p>
+
+              {selectedProduct ? (
+                <div className="mt-4 space-y-4">
+                  <div className="rounded-lg bg-slate-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+                      Selected Product
+                    </p>
+                    <p className="mt-1 font-semibold text-slate-900">
+                      {selectedProduct.name}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      {selectedProduct.supplierName}
+                    </p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      Target threshold:{" "}
+                      {selectedProduct.minimumOrderQuantity * 10}{" "}
+                      {selectedProduct.unit}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">
+                      Your committed quantity
+                    </label>
+                    <input
+                      type="number"
+                      min={selectedProduct.minimumOrderQuantity}
+                      value={desiredQuantity}
+                      onChange={(event) =>
+                        setDesiredQuantity(Number(event.target.value))
+                      }
+                      className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-sky-500"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleCreatePool}
+                    disabled={actionLoading}
+                    className="w-full rounded-xl bg-sky-600 py-3 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-60"
+                  >
+                    1) Create Pool with This Product
+                  </button>
+
+                  <button
+                    onClick={handleSimulateApplications}
+                    disabled={!poolState || actionLoading}
+                    className="w-full rounded-xl border border-slate-300 bg-white py-3 text-sm font-semibold text-slate-700 hover:border-slate-400 disabled:opacity-60"
+                  >
+                    2) Simulate Other Retailers Applying
+                  </button>
+
+                  <button
+                    onClick={handleDispatchAndTokenize}
+                    disabled={
+                      poolState?.stage !== "threshold_reached" || actionLoading
+                    }
+                    className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                  >
+                    3) Dispatch + Tokenize Allocation
+                  </button>
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-slate-600">
+                  Select a product to start the workflow.
+                </p>
+              )}
+            </div>
+
+            {poolState && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_-28px_rgba(15,23,42,0.7)]">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-semibold text-slate-950">
+                    Active Pool Snapshot
+                  </h3>
+                  <button
+                    onClick={handleResetPool}
+                    className="text-xs font-semibold text-slate-600 underline-offset-2 hover:underline"
+                  >
+                    Reset
+                  </button>
+                </div>
+
+                <p className="mt-2 text-sm text-slate-600">
+                  {poolState.poolName}
+                </p>
+
+                <div className="mt-4 h-2 rounded-full bg-slate-200">
+                  <div
+                    className="h-full rounded-full bg-emerald-500"
+                    style={{ width: `${poolProgress}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-sm text-slate-600">
+                  {poolState.pledgedQuantity} / {poolState.threshold} pledged (
+                  {poolProgress}%)
+                </p>
+
+                {poolState.tokenizedAt && (
+                  <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
+                    Tokenized at{" "}
+                    {new Date(poolState.tokenizedAt).toLocaleString()} |
+                    Estimated delivery{" "}
+                    {poolState.estimatedDelivery
+                      ? new Date(
+                          poolState.estimatedDelivery,
+                        ).toLocaleDateString()
+                      : "TBD"}
+                  </p>
+                )}
+
+                <div className="mt-4 space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+                    Tokenization Shares by Store
+                  </p>
+                  {poolState.participants.map((participant) => {
+                    const share = Math.round(
+                      (participant.quantity / poolState.pledgedQuantity) * 100,
+                    );
+
+                    return (
+                      <div
+                        key={participant.merchantId}
+                        className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"
+                      >
+                        <span className="font-medium text-slate-800">
+                          {participant.merchantId}
+                        </span>
+                        <span className="text-slate-600">
+                          {participant.quantity} units ({share}% token share)
                         </span>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-slate-600">{item.price}</td>
-                    <td className="px-6 py-4 text-slate-600">
-                      {item.delivery}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:border-slate-400">
-                          Pledge
-                        </button>
-                        <button className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700">
-                          Redeem
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </aside>
         </div>
-
-        {/* CTA Section */}
-        <div className="mt-10 rounded-2xl border border-slate-200 bg-gradient-to-r from-emerald-50 to-slate-50 p-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-950">
-                Ready to claim your physical goods?
-              </h2>
-              <p className="mt-2 max-w-2xl text-slate-600">
-                Select items to redeem and we will coordinate delivery to your
-                location on your preferred date. Your escrow will automatically
-                release upon carrier confirmation.
-              </p>
-            </div>
-            <button className="whitespace-nowrap rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-700">
-              Redeem for Physical Delivery
-            </button>
-          </div>
-        </div>
-      </div>
+      </section>
     </main>
   );
 }

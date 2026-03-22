@@ -5,11 +5,7 @@
       "get": {
         "operationId": "AppController_getHello",
         "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
+        "responses": { "200": { "description": "" } },
         "tags": ["App"]
       }
     },
@@ -17,11 +13,7 @@
       "get": {
         "operationId": "AppController_getApiSpecSite",
         "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
+        "responses": { "200": { "description": "" } },
         "tags": ["App"]
       }
     },
@@ -33,9 +25,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignupEmailDto"
-              }
+              "schema": { "$ref": "#/components/schemas/SignupEmailDto" }
             }
           }
         },
@@ -44,9 +34,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponseDto"
-                }
+                "schema": { "$ref": "#/components/schemas/AuthResponseDto" }
               }
             }
           }
@@ -63,9 +51,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginEmailDto"
-              }
+              "schema": { "$ref": "#/components/schemas/LoginEmailDto" }
             }
           }
         },
@@ -74,9 +60,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponseDto"
-                }
+                "schema": { "$ref": "#/components/schemas/AuthResponseDto" }
               }
             }
           }
@@ -93,9 +77,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignupGoogleDto"
-              }
+              "schema": { "$ref": "#/components/schemas/SignupGoogleDto" }
             }
           }
         },
@@ -104,9 +86,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponseDto"
-                }
+                "schema": { "$ref": "#/components/schemas/AuthResponseDto" }
               }
             }
           }
@@ -123,9 +103,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginGoogleDto"
-              }
+              "schema": { "$ref": "#/components/schemas/LoginGoogleDto" }
             }
           }
         },
@@ -134,9 +112,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponseDto"
-                }
+                "schema": { "$ref": "#/components/schemas/AuthResponseDto" }
               }
             }
           }
@@ -154,20 +130,36 @@
             "description": "",
             "content": {
               "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseDto" }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get current authenticated user profile",
+        "tags": ["auth"]
+      }
+    },
+    "/rwa/retailer/products": {
+      "get": {
+        "description": "Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.",
+        "operationId": "RwaController_getRetailerDashboardProducts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponseDto"
+                  "$ref": "#/components/schemas/RetailerDashboardProductsResponseDto"
                 }
               }
             }
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get current authenticated user profile",
-        "tags": ["auth"]
+        "security": [{ "bearer": [] }],
+        "summary": "Retailer dashboard first page: list products (mocked)",
+        "tags": ["rwa"]
       }
     },
     "/rwa/merchants/verify": {
@@ -178,9 +170,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifyMerchantDto"
-              }
+              "schema": { "$ref": "#/components/schemas/VerifyMerchantDto" }
             }
           }
         },
@@ -208,9 +198,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePoolDto"
-              }
+              "schema": { "$ref": "#/components/schemas/CreatePoolDto" }
             }
           }
         },
@@ -238,9 +226,7 @@
             "name": "poolId",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
@@ -267,9 +253,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CommitOrderDto"
-              }
+              "schema": { "$ref": "#/components/schemas/CommitOrderDto" }
             }
           }
         },
@@ -297,9 +281,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AggregateOrderDto"
-              }
+              "schema": { "$ref": "#/components/schemas/AggregateOrderDto" }
             }
           }
         },
@@ -327,9 +309,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TokenizeOrderDto"
-              }
+              "schema": { "$ref": "#/components/schemas/TokenizeOrderDto" }
             }
           }
         },
@@ -357,9 +337,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FinanceOrderDto"
-              }
+              "schema": { "$ref": "#/components/schemas/FinanceOrderDto" }
             }
           }
         },
@@ -387,9 +365,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TriggerSettlementDto"
-              }
+              "schema": { "$ref": "#/components/schemas/TriggerSettlementDto" }
             }
           }
         },
@@ -417,9 +393,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordRepaymentDto"
-              }
+              "schema": { "$ref": "#/components/schemas/RecordRepaymentDto" }
             }
           }
         },
@@ -447,9 +421,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PrepareBridgeDto"
-              }
+              "schema": { "$ref": "#/components/schemas/PrepareBridgeDto" }
             }
           }
         },
@@ -500,9 +472,7 @@
             "name": "orderId",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
@@ -549,10 +519,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "schema": {
-              "example": 200,
-              "type": "string"
-            }
+            "schema": { "example": 200, "type": "string" }
           }
         ],
         "responses": {
@@ -579,9 +546,7 @@
         "operationId": "RwaController_streamLogs",
         "parameters": [],
         "responses": {
-          "200": {
-            "description": "SSE stream of RWA log entries"
-          }
+          "200": { "description": "SSE stream of RWA log entries" }
         },
         "summary": "Stream RWA logs with Server-Sent Events",
         "tags": ["rwa"]
@@ -595,59 +560,34 @@
     "contact": {}
   },
   "tags": [
-    {
-      "name": "rwa",
-      "description": ""
-    },
-    {
-      "name": "auth",
-      "description": ""
-    }
+    { "name": "rwa", "description": "" },
+    { "name": "auth", "description": "" }
   ],
   "servers": [],
   "components": {
     "securitySchemes": {
-      "bearer": {
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "type": "http"
-      }
+      "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
     },
     "schemas": {
       "SignupEmailDto": {
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string",
-            "example": "retailer@shop.com"
-          },
-          "fullName": {
-            "type": "string",
-            "example": "Retail Partner One"
-          },
+          "email": { "type": "string", "example": "retailer@shop.com" },
+          "fullName": { "type": "string", "example": "Retail Partner One" },
           "role": {
             "type": "string",
             "enum": ["retailer", "supplier"],
             "example": "retailer"
           },
-          "password": {
-            "type": "string",
-            "example": "StrongPassword!123"
-          }
+          "password": { "type": "string", "example": "StrongPassword!123" }
         },
         "required": ["email", "fullName", "role", "password"]
       },
       "WalletResponseDto": {
         "type": "object",
         "properties": {
-          "network": {
-            "type": "string",
-            "example": "fuji"
-          },
-          "chainId": {
-            "type": "number",
-            "example": 43113
-          },
+          "network": { "type": "string", "example": "fuji" },
+          "chainId": { "type": "number", "example": 43113 },
           "rpcUrl": {
             "type": "string",
             "example": "https://api.avax-test.network/ext/bc/C/rpc"
@@ -666,18 +606,9 @@
       "UserResponseDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "example": "usr-kz6r9n2m"
-          },
-          "email": {
-            "type": "string",
-            "example": "retailer@shop.com"
-          },
-          "fullName": {
-            "type": "string",
-            "example": "Retail Partner One"
-          },
+          "id": { "type": "string", "example": "usr-kz6r9n2m" },
+          "email": { "type": "string", "example": "retailer@shop.com" },
+          "fullName": { "type": "string", "example": "Retail Partner One" },
           "role": {
             "type": "string",
             "enum": ["retailer", "supplier"],
@@ -688,9 +619,7 @@
             "enum": ["email", "google"],
             "example": "email"
           },
-          "wallet": {
-            "$ref": "#/components/schemas/WalletResponseDto"
-          },
+          "wallet": { "$ref": "#/components/schemas/WalletResponseDto" },
           "createdAt": {
             "type": "string",
             "example": "2026-03-22T12:10:00.000Z"
@@ -713,23 +642,15 @@
             "type": "string",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3Ita3o2cjluMm0iLCJlbWFpbCI6InJldGFpbGVyQHNob3AuY29tIiwicm9sZSI6InJldGFpbGVyIiwiaWF0IjoxNzExMTAwMDAwLCJleHAiOjE3MTExMDcyMDB9.signature"
           },
-          "user": {
-            "$ref": "#/components/schemas/UserResponseDto"
-          }
+          "user": { "$ref": "#/components/schemas/UserResponseDto" }
         },
         "required": ["accessToken", "user"]
       },
       "LoginEmailDto": {
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string",
-            "example": "retailer@shop.com"
-          },
-          "password": {
-            "type": "string",
-            "example": "StrongPassword!123"
-          }
+          "email": { "type": "string", "example": "retailer@shop.com" },
+          "password": { "type": "string", "example": "StrongPassword!123" }
         },
         "required": ["email", "password"]
       },
@@ -760,27 +681,82 @@
         },
         "required": ["idToken"]
       },
+      "RetailerDashboardProductResponseDto": {
+        "type": "object",
+        "properties": {
+          "sku": { "type": "string", "example": "cooking-oil-5l" },
+          "name": { "type": "string", "example": "Cooking Oil 5L" },
+          "category": { "type": "string", "example": "Essential Groceries" },
+          "supplierName": {
+            "type": "string",
+            "example": "Andes Wholesale Supply"
+          },
+          "unit": { "type": "string", "example": "container" },
+          "unitPrice": { "type": "number", "example": 18.75 },
+          "minimumOrderQuantity": { "type": "number", "example": 20 },
+          "availableQuantity": { "type": "number", "example": 1400 },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://images.example.com/products/cooking-oil-5l.png"
+          },
+          "tags": {
+            "example": ["high-turnover", "price-protected"],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2026-03-22T11:35:00.000Z"
+          }
+        },
+        "required": [
+          "sku",
+          "name",
+          "category",
+          "supplierName",
+          "unit",
+          "unitPrice",
+          "minimumOrderQuantity",
+          "availableQuantity",
+          "imageUrl",
+          "tags",
+          "updatedAt"
+        ]
+      },
+      "RetailerDashboardProductsResponseDto": {
+        "type": "object",
+        "properties": {
+          "retailerId": { "type": "string", "example": "usr-4f9b4n2z" },
+          "currency": { "type": "string", "example": "USD" },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RetailerDashboardProductResponseDto"
+            }
+          },
+          "generatedAt": {
+            "type": "string",
+            "example": "2026-03-22T11:35:02.000Z"
+          },
+          "mocked": { "type": "boolean", "example": true }
+        },
+        "required": [
+          "retailerId",
+          "currency",
+          "products",
+          "generatedAt",
+          "mocked"
+        ]
+      },
       "VerifyMerchantDto": {
         "type": "object",
         "properties": {
-          "merchantId": {
-            "type": "string",
-            "example": "merchant-001"
-          },
-          "legalName": {
-            "type": "string",
-            "example": "Retailer ABC Ltd."
-          },
-          "jurisdiction": {
-            "type": "string",
-            "example": "MX"
-          },
+          "merchantId": { "type": "string", "example": "merchant-001" },
+          "legalName": { "type": "string", "example": "Retailer ABC Ltd." },
+          "jurisdiction": { "type": "string", "example": "MX" },
           "metadata": {
             "type": "object",
-            "example": {
-              "taxId": "ABCD123",
-              "businessType": "grocery"
-            }
+            "example": { "taxId": "ABCD123", "businessType": "grocery" }
           }
         },
         "required": ["merchantId", "legalName", "jurisdiction"]
@@ -788,18 +764,9 @@
       "MerchantProfileResponseDto": {
         "type": "object",
         "properties": {
-          "merchantId": {
-            "type": "string",
-            "example": "merchant-001"
-          },
-          "legalName": {
-            "type": "string",
-            "example": "Retailer ABC Ltd."
-          },
-          "jurisdiction": {
-            "type": "string",
-            "example": "MX"
-          },
+          "merchantId": { "type": "string", "example": "merchant-001" },
+          "legalName": { "type": "string", "example": "Retailer ABC Ltd." },
+          "jurisdiction": { "type": "string", "example": "MX" },
           "status": {
             "type": "string",
             "enum": ["pending", "verified", "rejected"],
@@ -809,9 +776,7 @@
             "type": "string",
             "example": "2026-03-21T19:10:30.000Z"
           },
-          "metadata": {
-            "type": "object"
-          }
+          "metadata": { "type": "object" }
         },
         "required": ["merchantId", "legalName", "jurisdiction", "status"]
       },
@@ -826,9 +791,7 @@
             "example": ["merchant-001", "merchant-002"],
             "description": "Permissioned merchant IDs allowed to participate in the pool",
             "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "items": { "type": "string" }
           }
         },
         "required": ["name", "allowedMerchants"]
@@ -844,16 +807,11 @@
             "type": "string",
             "example": "North Zone Q2 Procurement Pool"
           },
-          "permissioned": {
-            "type": "boolean",
-            "example": true
-          },
+          "permissioned": { "type": "boolean", "example": true },
           "allowedMerchants": {
             "example": ["merchant-001", "merchant-002"],
             "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "items": { "type": "string" }
           },
           "createdAt": {
             "type": "string",
@@ -885,22 +843,10 @@
             "type": "string",
             "example": "pool-1711032191000-q9s9p2mz"
           },
-          "merchantId": {
-            "type": "string",
-            "example": "merchant-001"
-          },
-          "sku": {
-            "type": "string",
-            "example": "cooking-oil-5l"
-          },
-          "quantity": {
-            "type": "number",
-            "example": 120
-          },
-          "unitPrice": {
-            "type": "number",
-            "example": 18.75
-          },
+          "merchantId": { "type": "string", "example": "merchant-001" },
+          "sku": { "type": "string", "example": "cooking-oil-5l" },
+          "quantity": { "type": "number", "example": 120 },
+          "unitPrice": { "type": "number", "example": 18.75 },
           "notes": {
             "type": "string",
             "example": "Need delivery before next Friday"
@@ -919,22 +865,10 @@
             "type": "string",
             "example": "pool-1711032191000-q9s9p2mz"
           },
-          "merchantId": {
-            "type": "string",
-            "example": "merchant-001"
-          },
-          "sku": {
-            "type": "string",
-            "example": "cooking-oil-5l"
-          },
-          "quantity": {
-            "type": "number",
-            "example": 120
-          },
-          "unitPrice": {
-            "type": "number",
-            "example": 18.75
-          },
+          "merchantId": { "type": "string", "example": "merchant-001" },
+          "sku": { "type": "string", "example": "cooking-oil-5l" },
+          "quantity": { "type": "number", "example": 120 },
+          "unitPrice": { "type": "number", "example": 18.75 },
           "encryptedPayload": {
             "type": "string",
             "example": "AQQ4oB6h4NbcY2U..."
@@ -1004,18 +938,9 @@
             "type": "string",
             "example": "supplier-credit-desk-01"
           },
-          "amount": {
-            "type": "number",
-            "example": 125000.5
-          },
-          "annualizedRateBps": {
-            "type": "number",
-            "example": 1450
-          },
-          "tenorDays": {
-            "type": "number",
-            "example": 45
-          },
+          "amount": { "type": "number", "example": 125000.5 },
+          "annualizedRateBps": { "type": "number", "example": 1450 },
+          "tenorDays": { "type": "number", "example": 45 },
           "txHash": {
             "type": "string",
             "example": "0x5f8e4b5dc9e845f7f73b0b8a43c77b4f5f604f5078b25d7f8114bf3f4a26e0a2"
@@ -1059,18 +984,12 @@
             "type": "string",
             "example": "repayment-1711033443000-51d2j0m2"
           },
-          "amount": {
-            "type": "number",
-            "example": 25000
-          },
+          "amount": { "type": "number", "example": 25000 },
           "txHash": {
             "type": "string",
             "example": "0x9c02f0410ec6ca65535ff82011be2f66a8495f07d6203ebca342b266e7d7beec"
           },
-          "paidAt": {
-            "type": "string",
-            "example": "2026-03-22T08:20:10.000Z"
-          }
+          "paidAt": { "type": "string", "example": "2026-03-22T08:20:10.000Z" }
         },
         "required": ["repaymentId", "amount", "txHash", "paidAt"]
       },
@@ -1094,9 +1013,7 @@
             "type": "string",
             "example": "2026-03-22T10:14:32.000Z"
           },
-          "metadata": {
-            "type": "object"
-          }
+          "metadata": { "type": "object" }
         },
         "required": ["targetNetwork", "bridgeAssetId", "txHash", "preparedAt"]
       },
@@ -1111,28 +1028,14 @@
             "type": "string",
             "example": "pool-1711032191000-q9s9p2mz"
           },
-          "totalQuantity": {
-            "type": "number",
-            "example": 860
-          },
-          "weightedUnitPrice": {
-            "type": "number",
-            "example": 19.2
-          },
-          "totalNotional": {
-            "type": "number",
-            "example": 16512
-          },
-          "participatingMerchants": {
-            "type": "number",
-            "example": 4
-          },
+          "totalQuantity": { "type": "number", "example": 860 },
+          "weightedUnitPrice": { "type": "number", "example": 19.2 },
+          "totalNotional": { "type": "number", "example": 16512 },
+          "participatingMerchants": { "type": "number", "example": 4 },
           "commitmentIds": {
             "example": ["commitment-1", "commitment-2"],
             "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "items": { "type": "string" }
           },
           "status": {
             "type": "string",
@@ -1154,17 +1057,11 @@
           "tokenization": {
             "$ref": "#/components/schemas/TokenizationRecordDto"
           },
-          "financing": {
-            "$ref": "#/components/schemas/FinancingRecordDto"
-          },
-          "settlement": {
-            "$ref": "#/components/schemas/SettlementRecordDto"
-          },
+          "financing": { "$ref": "#/components/schemas/FinancingRecordDto" },
+          "settlement": { "$ref": "#/components/schemas/SettlementRecordDto" },
           "repayments": {
             "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RepaymentRecordDto"
-            }
+            "items": { "$ref": "#/components/schemas/RepaymentRecordDto" }
           },
           "bridgePreparation": {
             "$ref": "#/components/schemas/BridgePreparationDto"
@@ -1204,19 +1101,13 @@
             "type": "string",
             "example": "supplier-credit-desk-01"
           },
-          "amount": {
-            "type": "number",
-            "example": 125000.5
-          },
+          "amount": { "type": "number", "example": 125000.5 },
           "annualizedRateBps": {
             "type": "number",
             "example": 1450,
             "description": "Annualized financing rate in basis points"
           },
-          "tenorDays": {
-            "type": "number",
-            "example": 45
-          }
+          "tenorDays": { "type": "number", "example": 45 }
         },
         "required": [
           "orderId",
@@ -1247,10 +1138,7 @@
             "type": "string",
             "example": "order-1711033191000-y2d4l8pr"
           },
-          "amount": {
-            "type": "number",
-            "example": 25000
-          }
+          "amount": { "type": "number", "example": 25000 }
         },
         "required": ["orderId", "amount"]
       },
@@ -1279,30 +1167,12 @@
       "RwaLifecycleStatusResponseDto": {
         "type": "object",
         "properties": {
-          "pools": {
-            "type": "number",
-            "example": 2
-          },
-          "verifiedMerchants": {
-            "type": "number",
-            "example": 8
-          },
-          "aggregatedOrders": {
-            "type": "number",
-            "example": 4
-          },
-          "fundedOrders": {
-            "type": "number",
-            "example": 3
-          },
-          "settledOrders": {
-            "type": "number",
-            "example": 2
-          },
-          "repaidOrders": {
-            "type": "number",
-            "example": 1
-          }
+          "pools": { "type": "number", "example": 2 },
+          "verifiedMerchants": { "type": "number", "example": 8 },
+          "aggregatedOrders": { "type": "number", "example": 4 },
+          "fundedOrders": { "type": "number", "example": 3 },
+          "settledOrders": { "type": "number", "example": 2 },
+          "repaidOrders": { "type": "number", "example": 1 }
         },
         "required": [
           "pools",
@@ -1316,26 +1186,15 @@
       "RwaLogEntryResponseDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "example": "1711034077842-yg91n4wz"
-          },
-          "at": {
-            "type": "string",
-            "example": "2026-03-22T10:18:35.842Z"
-          },
+          "id": { "type": "string", "example": "1711034077842-yg91n4wz" },
+          "at": { "type": "string", "example": "2026-03-22T10:18:35.842Z" },
           "level": {
             "type": "string",
             "enum": ["info", "warn", "error"],
             "example": "info"
           },
-          "event": {
-            "type": "string",
-            "example": "order.bridge.prepared"
-          },
-          "context": {
-            "type": "object"
-          }
+          "event": { "type": "string", "example": "order.bridge.prepared" },
+          "context": { "type": "object" }
         },
         "required": ["id", "at", "level", "event"]
       }

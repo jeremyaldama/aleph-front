@@ -42,6 +42,8 @@ import type { PurchasePoolResponseDto } from '../models';
 // @ts-ignore
 import type { RecordRepaymentDto } from '../models';
 // @ts-ignore
+import type { RetailerDashboardProductsResponseDto } from '../models';
+// @ts-ignore
 import type { RwaLifecycleStatusResponseDto } from '../models';
 // @ts-ignore
 import type { RwaLogEntryResponseDto } from '../models';
@@ -252,6 +254,40 @@ export const RwaApiAxiosParamCreator = function (configuration?: Configuration) 
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.
+         * @summary Retailer dashboard first page: list products (mocked)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rwaControllerGetRetailerDashboardProducts: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/rwa/retailer/products`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -651,6 +687,18 @@ export const RwaApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.
+         * @summary Retailer dashboard first page: list products (mocked)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rwaControllerGetRetailerDashboardProducts(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RetailerDashboardProductsResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rwaControllerGetRetailerDashboardProducts(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RwaApi.rwaControllerGetRetailerDashboardProducts']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary List all aggregated orders
          * @param {*} [options] Override http request option.
@@ -834,6 +882,15 @@ export const RwaApiFactory = function (configuration?: Configuration, basePath?:
             return localVarFp.rwaControllerGetPool(poolId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.
+         * @summary Retailer dashboard first page: list products (mocked)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rwaControllerGetRetailerDashboardProducts(options?: RawAxiosRequestConfig): AxiosPromise<RetailerDashboardProductsResponseDto> {
+            return localVarFp.rwaControllerGetRetailerDashboardProducts(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary List all aggregated orders
          * @param {*} [options] Override http request option.
@@ -991,6 +1048,16 @@ export class RwaApi extends BaseAPI {
      */
     public rwaControllerGetPool(poolId: string, options?: RawAxiosRequestConfig) {
         return RwaApiFp(this.configuration).rwaControllerGetPool(poolId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.
+     * @summary Retailer dashboard first page: list products (mocked)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public rwaControllerGetRetailerDashboardProducts(options?: RawAxiosRequestConfig) {
+        return RwaApiFp(this.configuration).rwaControllerGetRetailerDashboardProducts(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
