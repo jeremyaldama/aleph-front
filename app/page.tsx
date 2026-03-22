@@ -99,6 +99,55 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="relative mx-auto w-full max-w-6xl px-6 pb-16 pt-6 lg:px-10">
+        <h2 className="text-3xl font-semibold tracking-tight text-slate-950">
+          The Retailer Experience
+        </h2>
+        <p className="mt-2 max-w-2xl text-slate-600">
+          Discover active campaigns, join with one click, and watch your
+          collective purchasing power grow real-time.
+        </p>
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              step: "1",
+              title: "Discover",
+              desc: "Browse open procurement campaigns grouped by product category, volume, and retailer network.",
+            },
+            {
+              step: "2",
+              title: "Join",
+              desc: "Commit your demand in seconds. Escrow is held transparently, settlement happens at milestone.",
+            },
+            {
+              step: "3",
+              title: "Track",
+              desc: "See aggregated demand grow, token balances update, and receive notifications at each phase.",
+            },
+            {
+              step: "4",
+              title: "Repay",
+              desc: "On-chain settlement confirms your tokenized share. Financing layers adjust based on actual delivery.",
+            },
+          ].map((item) => (
+            <article
+              key={item.step}
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_16px_-30px_rgba(15,23,42,0.5)]"
+            >
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sm font-bold text-sky-600">
+                {item.step}
+              </span>
+              <h3 className="mt-3 text-base font-semibold text-slate-900">
+                {item.title}
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                {item.desc}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="relative mx-auto w-full max-w-6xl px-6 pb-20 lg:px-10">
         <h2 className="text-3xl font-semibold tracking-tight text-slate-950">
           Core Ledger Capabilities
@@ -134,6 +183,156 @@ export default function Home() {
               </p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="relative mx-auto w-full max-w-6xl gap-8 px-6 py-16 lg:px-10">
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-sky-600">
+              For Retailers
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+              Real-Time Campaign Dashboards
+            </h2>
+            <p className="mt-3 text-sm text-slate-600">
+              Join campaigns and instantly see your aggregated buying power.
+              Monitor tokenized inventory positions, track settlement status at
+              each milestone, and receive real-time notifications as demand
+              pools grow.
+            </p>
+            <ul className="mt-5 space-y-2 text-sm text-slate-600">
+              <li className="flex gap-2">
+                <span className="text-emerald-600">✓</span>
+                Simplified one-click campaign participation
+              </li>
+              <li className="flex gap-2">
+                <span className="text-emerald-600">✓</span>
+                Tokenized asset ownership and trading
+              </li>
+              <li className="flex gap-2">
+                <span className="text-emerald-600">✓</span>
+                Transparent pricing & embedded financing options
+              </li>
+              <li className="flex gap-2">
+                <span className="text-emerald-600">✓</span>
+                Delivery tracking & settlement confirmation
+              </li>
+            </ul>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-600">
+              Dashboard Preview
+            </p>
+            <div className="mt-4 space-y-3">
+              <div>
+                <p className="text-sm font-medium text-slate-700">
+                  My Campaigns
+                </p>
+                <div className="mt-2 rounded-xl bg-white p-3">
+                  <div className="flex justify-between text-xs">
+                    <span>Fresh Produce Pool</span>
+                    <span className="font-semibold text-slate-900">$84K</span>
+                  </div>
+                  <div className="mt-1 h-1.5 rounded-full bg-slate-200">
+                    <div className="h-full w-[92%] rounded-full bg-emerald-500" />
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    92% target reached
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-700">
+                  Token Balance
+                </p>
+                <p className="mt-1 rounded-xl bg-white px-3 py-2 text-lg font-semibold text-slate-900">
+                  2,847 tokens
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-700">
+                  Pending Settlement
+                </p>
+                <p className="mt-1 rounded-xl bg-white px-3 py-2 text-sm text-slate-600">
+                  $12.4K (escrow held)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative mx-auto w-full max-w-6xl gap-8 px-6 py-16 lg:px-10">
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 lg:order-2">
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-600">
+              Supply Visibility
+            </p>
+            <div className="mt-4 space-y-3">
+              <div>
+                <p className="text-sm font-medium text-slate-700">
+                  Demand Signals
+                </p>
+                <div className="mt-2 rounded-xl bg-white p-3">
+                  <div className="flex justify-between text-xs">
+                    <span>Cold Storage - Q2</span>
+                    <span className="font-semibold text-slate-900">+$1.9M</span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    46 retailers pooled
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-700">
+                  Inventory Allocated
+                </p>
+                <p className="mt-1 rounded-xl bg-white px-3 py-2 text-lg font-semibold text-slate-900">
+                  48,200 units
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-700">
+                  Fulfillment Status
+                </p>
+                <p className="mt-1 rounded-xl bg-white px-3 py-2 text-sm text-slate-600">
+                  In transit → delivery in 8 days
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="lg:order-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-teal-600">
+              For Suppliers
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+              Campaign Management & Fulfillment
+            </h2>
+            <p className="mt-3 text-sm text-slate-600">
+              See real-time demand signals from retailer pools. Manage inventory
+              allocation, customize financing terms, and track campaign
+              milestones from commitment through final settlement.
+            </p>
+            <ul className="mt-5 space-y-2 text-sm text-slate-600">
+              <li className="flex gap-2">
+                <span className="text-teal-600">✓</span>
+                Aggregate demand visibility from all active campaigns
+              </li>
+              <li className="flex gap-2">
+                <span className="text-teal-600">✓</span>
+                Dynamic inventory allocation & tokenization control
+              </li>
+              <li className="flex gap-2">
+                <span className="text-teal-600">✓</span>
+                Embedded financing setup (credit terms & escrow release)
+              </li>
+              <li className="flex gap-2">
+                <span className="text-teal-600">✓</span>
+                Fulfillment orchestration & milestone tracking
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
 
