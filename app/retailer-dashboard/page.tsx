@@ -6,7 +6,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import type { RetailerDashboardProductResponseDto } from "@/generated/aleph-be";
 import {
   aggregatePool,
-  commitRetailerOrder,
+  commitRetailerOrderWithAutoVerify,
   createPurchasePool,
   getRetailerDashboardProducts,
   getStoredAccessToken,
@@ -156,7 +156,7 @@ function RetailerDashboardContent() {
     }
 
     try {
-      await commitRetailerOrder(
+      await commitRetailerOrderWithAutoVerify(
         {
           poolId,
           merchantId: retailerId,
@@ -166,8 +166,15 @@ function RetailerDashboardContent() {
         },
         accessToken,
       );
-    } catch {
-      // Keep the UI flow active even if commitment API is unavailable.
+    } catch (error) {
+      const fallbackMessage =
+        "Commitment failed on backend. Pool remains visible in UI simulation mode.";
+
+      if (error instanceof Error) {
+        setStatusMessage(`${fallbackMessage} ${error.message}`);
+      } else {
+        setStatusMessage(fallbackMessage);
+      }
     }
 
     const nextPool: WorkflowPoolState = {

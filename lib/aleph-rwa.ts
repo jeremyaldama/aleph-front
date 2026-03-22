@@ -5,6 +5,7 @@ import {
   type CreatePoolDto,
   type PurchasePoolResponseDto,
   type RetailerDashboardProductResponseDto,
+  type VerifyMerchantDto,
   RwaApi,
 } from "@/generated/aleph-be";
 
@@ -136,6 +137,100 @@ export async function commitRetailerOrder(
   const api = getRwaApi(accessToken);
   const { data } = await api.rwaControllerCommitOrder(payload);
   return data;
+}
+
+type StoredUserProfile = {
+  id?: string;
+  email?: string;
+  fullName?: string;
+  role?: string;
+};
+
+function getStoredUserProfile(): StoredUserProfile {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  const raw = window.localStorage.getItem("aleph_user");
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(raw) as StoredUserProfile;
+  } catch {
+    return {};
+  }
+}
+
+function extractErrorMessage(error: unknown) {
+  if (typeof error !== "object" || error === null) {
+    return "";
+  }
+
+  if (
+    "response" in error &&
+    typeof error.response === "object" &&
+    error.response !== null &&
+    "data" in error.response &&
+    typeof error.response.data === "object" &&
+    error.response.data !== null &&
+    "message" in error.response.data &&
+    typeof error.response.data.message === "string"
+  ) {
+    return error.response.data.message;
+  }
+
+  if ("message" in error && typeof error.message === "string") {
+    return error.message;
+  }
+
+  return "";
+}
+
+function isMissingMerchantError(error: unknown) {
+  const message = extractErrorMessage(error).toLowerCase();
+  return message.includes("merchant") && message.includes("not found");
+}
+
+async function verifyMerchantForCommit(
+  merchantId: string,
+  accessToken?: string,
+) {
+  const api = getRwaApi(accessToken);
+  const user = getStoredUserProfile();
+
+  const payload: VerifyMerchantDto = {
+    merchantId,
+    legalName:
+      user.fullName ||
+      (user.email ? `Merchant ${user.email}` : `Merchant ${merchantId}`),
+    jurisdiction: "US",
+    metadata: {
+      source: "aleph-front",
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    },
+  };
+
+  await api.rwaControllerVerifyMerchant(payload);
+}
+
+export async function commitRetailerOrderWithAutoVerify(
+  payload: CommitOrderDto,
+  accessToken?: string,
+) {
+  try {
+    return await commitRetailerOrder(payload, accessToken);
+  } catch (error) {
+    if (!isMissingMerchantError(error)) {
+      throw error;
+    }
+
+    await verifyMerchantForCommit(payload.merchantId, accessToken);
+    return commitRetailerOrder(payload, accessToken);
+  }
 }
 
 export async function aggregatePool(
