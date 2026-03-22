@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import type { RetailerDashboardProductResponseDto } from "@/generated/aleph-be";
 import {
   getRetailerDashboardProducts,
@@ -18,7 +18,7 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-export default function ProductDetail() {
+function ProductDetailContent() {
   const searchParams = useSearchParams();
   const sku = searchParams.get("sku");
 
@@ -215,5 +215,23 @@ export default function ProductDetail() {
         </aside>
       </div>
     </main>
+  );
+}
+
+function ProductDetailFallback() {
+  return (
+    <main className="min-h-screen bg-[#f7fafc] px-6 py-10 text-slate-900 lg:px-10">
+      <p className="mx-auto w-full max-w-6xl rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+        Loading product details...
+      </p>
+    </main>
+  );
+}
+
+export default function ProductDetail() {
+  return (
+    <Suspense fallback={<ProductDetailFallback />}>
+      <ProductDetailContent />
+    </Suspense>
   );
 }

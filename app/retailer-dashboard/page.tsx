@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import type { RetailerDashboardProductResponseDto } from "@/generated/aleph-be";
 import {
   aggregatePool,
@@ -62,7 +62,7 @@ function getStageLabel(pool: WorkflowPoolState | null) {
   return "Open for retailer applications";
 }
 
-export default function RetailerDashboard() {
+function RetailerDashboardContent() {
   const searchParams = useSearchParams();
   const skuFromQuery = searchParams.get("sku");
 
@@ -547,5 +547,25 @@ export default function RetailerDashboard() {
         </div>
       </section>
     </main>
+  );
+}
+
+function RetailerDashboardFallback() {
+  return (
+    <main className="min-h-screen bg-[#f7fafc] text-slate-900">
+      <section className="mx-auto w-full max-w-7xl px-6 py-10 lg:px-10">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+          Loading retailer dashboard...
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export default function RetailerDashboard() {
+  return (
+    <Suspense fallback={<RetailerDashboardFallback />}>
+      <RetailerDashboardContent />
+    </Suspense>
   );
 }
