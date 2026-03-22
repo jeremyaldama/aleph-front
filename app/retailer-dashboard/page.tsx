@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import type {
   MerchantOrderCommitmentResponseDto,
+  PoolProgressResponseDto,
   PurchasePoolResponseDto,
   RetailerDashboardProductResponseDto,
 } from "@/generated/aleph-be";
@@ -12,11 +13,13 @@ import {
   aggregatePool,
   commitRetailerOrderWithAutoVerify,
   createPurchasePool,
+  getPoolProgress,
   getRetailerDashboardProducts,
   getStoredAccessToken,
   getStoredRetailerId,
   loadWorkflowPoolState,
   saveWorkflowPoolState,
+  seedPoolMockCommitments,
   tokenizeAggregatedOrder,
   WORKFLOW_POOL_STORAGE_KEY,
   type WorkflowParticipant,
@@ -39,7 +42,7 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-function getPoolProgress(pool: WorkflowPoolState | null) {
+function getLocalProgressPercent(pool: WorkflowPoolState | null) {
   if (!pool) {
     return 0;
   }
@@ -66,6 +69,29 @@ function getStageLabel(pool: WorkflowPoolState | null) {
   return "Open for retailer applications";
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "response" in error &&
+    typeof error.response === "object" &&
+    error.response !== null &&
+    "data" in error.response &&
+    typeof error.response.data === "object" &&
+    error.response.data !== null &&
+    "message" in error.response.data &&
+    typeof error.response.data.message === "string"
+  ) {
+    return error.response.data.message;
+  }
+
+  return "Unknown backend error";
+}
+
 function RetailerDashboardContent() {
   const searchParams = useSearchParams();
   const skuFromQuery = searchParams.get("sku");
@@ -83,13 +109,18 @@ function RetailerDashboardContent() {
     useState<PurchasePoolResponseDto | null>(null);
   const [latestCommitmentResponse, setLatestCommitmentResponse] =
     useState<MerchantOrderCommitmentResponseDto | null>(null);
+  const [latestProgressResponse, setLatestProgressResponse] =
+    useState<PoolProgressResponseDto | null>(null);
 
   const selectedProduct = useMemo(
     () => products.find((product) => product.sku === selectedSku) ?? null,
     [products, selectedSku],
   );
 
-  const poolProgress = useMemo(() => getPoolProgress(poolState), [poolState]);
+  const poolProgress = useMemo(
+    () => getLocalProgressPercent(poolState),
+    [poolState],
+  );
 
   useEffect(() => {
     async function loadProducts() {
@@ -218,14 +249,92 @@ function RetailerDashboardContent() {
       ],
     };
 
+    try {
+      const progress = await getPoolProgress(poolId, accessToken);
+      setLatestProgressResponse(progress);
+      nextPool.threshold = progress.thresholdQuantity;
+      nextPool.pledgedQuantity = progress.committedQuantity;
+      nextPool.stage = progress.canAggregate
+        ? "threshold_reached"
+        : "pool_open";
+    } catch {
+      // Keep local values if progress endpoint is unavailable.
+    }
+
     setPoolState(nextPool);
     saveWorkflowPoolState(nextPool);
     setActionLoading(false);
   }
 
-  function handleSimulateApplications() {
+  async function handleSimulateApplications() {
     if (!poolState || poolState.stage === "tokenized") {
       return;
+    }
+
+    setActionLoading(true);
+    const accessToken = getStoredAccessToken();
+
+    try {
+      const seededCommitments = await seedPoolMockCommitments(
+        poolState.poolId,
+        {
+          merchantIds: SIMULATED_RETAILERS,
+          quantity: Math.max(
+            1,
+            Math.ceil(poolState.threshold / (SIMULATED_RETAILERS.length * 1.2)),
+          ),
+          unitPrice: selectedProduct?.unitPrice,
+        },
+        accessToken,
+      );
+
+      const seededParticipants: WorkflowParticipant[] = seededCommitments.map(
+        (commitment) => ({
+          merchantId: commitment.merchantId,
+          quantity: commitment.quantity,
+        }),
+      );
+
+      let nextState: WorkflowPoolState = {
+        ...poolState,
+        participants: [
+          ...poolState.participants.filter(
+            (participant) =>
+              !seededParticipants.some(
+                (seeded) => seeded.merchantId === participant.merchantId,
+              ),
+          ),
+          ...seededParticipants,
+        ],
+      };
+
+      try {
+        const progress = await getPoolProgress(poolState.poolId, accessToken);
+        setLatestProgressResponse(progress);
+        nextState = {
+          ...nextState,
+          threshold: progress.thresholdQuantity,
+          pledgedQuantity: progress.committedQuantity,
+          stage: progress.canAggregate ? "threshold_reached" : "pool_open",
+        };
+
+        setStatusMessage(
+          progress.canAggregate
+            ? "Pool reached threshold on backend. You can now run Dispatch + Tokenize."
+            : `Seeded commitments on backend. Missing quantity to aggregate: ${progress.missingQuantity}.`,
+        );
+      } catch {
+        setStatusMessage(
+          "Mock commitments seeded on backend. Progress endpoint unavailable, using local view.",
+        );
+      }
+
+      setPoolState(nextState);
+      saveWorkflowPoolState(nextState);
+      setActionLoading(false);
+      return;
+    } catch {
+      // Fall back to local simulation when backend dev seed endpoint is unavailable.
     }
 
     let pledgedQuantity = poolState.pledgedQuantity;
@@ -269,6 +378,7 @@ function RetailerDashboardContent() {
         ? "Threshold reached. Supplier can now dispatch this pool and trigger tokenization."
         : "More retailers still need to apply before threshold is reached.",
     );
+    setActionLoading(false);
   }
 
   async function handleDispatchAndTokenize() {
@@ -279,6 +389,29 @@ function RetailerDashboardContent() {
     setActionLoading(true);
 
     const accessToken = getStoredAccessToken();
+    if (!accessToken) {
+      setStatusMessage(
+        "Missing bearer token. Please log in again before dispatching.",
+      );
+      setActionLoading(false);
+      return;
+    }
+
+    try {
+      const progress = await getPoolProgress(poolState.poolId, accessToken);
+      setLatestProgressResponse(progress);
+
+      if (!progress.canAggregate) {
+        setStatusMessage(
+          `Pool is not ready to dispatch. Missing quantity: ${progress.missingQuantity}. Seed more commitments first.`,
+        );
+        setActionLoading(false);
+        return;
+      }
+    } catch {
+      // Continue if progress endpoint is unavailable.
+    }
+
     let orderId = poolState.orderId ?? `order-local-${Date.now()}`;
 
     try {
@@ -287,8 +420,12 @@ function RetailerDashboardContent() {
         accessToken,
       );
       orderId = aggregatedOrder.orderId;
-    } catch {
-      // Keep local fallback if aggregation endpoint is unavailable.
+    } catch (error) {
+      setStatusMessage(
+        `Aggregation failed on backend: ${getErrorMessage(error)}`,
+      );
+      setActionLoading(false);
+      return;
     }
 
     try {
@@ -300,10 +437,12 @@ function RetailerDashboardContent() {
       setStatusMessage(
         "Supplier dispatch confirmed and tokenization registered on backend.",
       );
-    } catch {
+    } catch (error) {
       setStatusMessage(
-        "Dispatch/tokenization endpoint is unavailable. UI moved forward with local tokenization state.",
+        `Tokenization failed on backend: ${getErrorMessage(error)}`,
       );
+      setActionLoading(false);
+      return;
     }
 
     const eta = new Date();
@@ -351,7 +490,9 @@ function RetailerDashboardContent() {
           </p>
         )}
 
-        {(latestPoolResponse || latestCommitmentResponse) && (
+        {(latestPoolResponse ||
+          latestCommitmentResponse ||
+          latestProgressResponse) && (
           <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
             <p className="font-semibold">Latest backend event</p>
             {latestPoolResponse && (
@@ -366,6 +507,13 @@ function RetailerDashboardContent() {
                 <span className="font-mono">
                   {latestCommitmentResponse.commitmentId}
                 </span>
+              </p>
+            )}
+            {latestProgressResponse && (
+              <p className="mt-1">
+                Progress: {latestProgressResponse.committedQuantity} /{" "}
+                {latestProgressResponse.thresholdQuantity} (missing{" "}
+                {latestProgressResponse.missingQuantity})
               </p>
             )}
           </div>
@@ -505,7 +653,7 @@ function RetailerDashboardContent() {
                     disabled={!poolState || actionLoading}
                     className="w-full rounded-xl border border-slate-300 bg-white py-3 text-sm font-semibold text-slate-700 hover:border-slate-400 disabled:opacity-60"
                   >
-                    2) Simulate Other Retailers Applying
+                    2) Seed Other Retailers (Backend)
                   </button>
 
                   <button

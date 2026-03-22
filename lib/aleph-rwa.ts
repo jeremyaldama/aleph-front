@@ -3,8 +3,11 @@ import {
   type CommitOrderDto,
   Configuration,
   type CreatePoolDto,
+  type MerchantOrderCommitmentResponseDto,
+  type PoolProgressResponseDto,
   type PurchasePoolResponseDto,
   type RetailerDashboardProductResponseDto,
+  type SeedMockCommitmentsDto,
   type VerifyMerchantDto,
   RwaApi,
 } from "@/generated/aleph-be";
@@ -283,6 +286,29 @@ export async function tokenizeAggregatedOrder(
       headers: getAuthHeaders(accessToken),
     },
   );
+  return data;
+}
+
+export async function getPoolProgress(
+  poolId: string,
+  accessToken?: string,
+): Promise<PoolProgressResponseDto> {
+  const api = getRwaApi(accessToken);
+  const { data } = await api.rwaControllerGetPoolProgress(poolId, {
+    headers: getAuthHeaders(accessToken),
+  });
+  return data;
+}
+
+export async function seedPoolMockCommitments(
+  poolId: string,
+  payload?: SeedMockCommitmentsDto,
+  accessToken?: string,
+): Promise<Array<MerchantOrderCommitmentResponseDto>> {
+  const api = getRwaApi(accessToken);
+  const { data } = await api.rwaControllerSeedMockCommitments(poolId, payload, {
+    headers: getAuthHeaders(accessToken),
+  });
   return data;
 }
 
