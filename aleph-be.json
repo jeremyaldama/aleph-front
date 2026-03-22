@@ -1,0 +1,1344 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["App"]
+      }
+    },
+    "/api-spec": {
+      "get": {
+        "operationId": "AppController_getApiSpecSite",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["App"]
+      }
+    },
+    "/auth/signup-email": {
+      "post": {
+        "operationId": "AuthController_signupEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create retailer or supplier account with email/password and create Fuji wallet",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/login-email": {
+      "post": {
+        "operationId": "AuthController_loginEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Login with email/password",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/signup-google": {
+      "post": {
+        "operationId": "AuthController_signupGoogle",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupGoogleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create retailer or supplier account with Google login and create Fuji wallet",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/login-google": {
+      "post": {
+        "operationId": "AuthController_loginGoogle",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginGoogleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Login with Google ID token",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current authenticated user profile",
+        "tags": ["auth"]
+      }
+    },
+    "/rwa/merchants/verify": {
+      "post": {
+        "operationId": "RwaController_verifyMerchant",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyMerchantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Verify merchant eligibility for permissioned pools",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/pools": {
+      "post": {
+        "operationId": "RwaController_createPool",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePoolDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePoolResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a permissioned purchase pool on private L1",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/pools/{poolId}": {
+      "get": {
+        "operationId": "RwaController_getPool",
+        "parameters": [
+          {
+            "name": "poolId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchasePoolResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get one purchase pool by id",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/commitments": {
+      "post": {
+        "operationId": "RwaController_commitOrder",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantOrderCommitmentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Commit encrypted merchant order details into a pool",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/orders/aggregate": {
+      "post": {
+        "operationId": "RwaController_aggregate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AggregateOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregatedOrderResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Aggregate pool commitments into one structured order",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/orders/tokenize": {
+      "post": {
+        "operationId": "RwaController_tokenize",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenizeOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregatedOrderResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Tokenize aggregated order into entitlement and repayment tokens",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/orders/finance": {
+      "post": {
+        "operationId": "RwaController_finance",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinanceOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregatedOrderResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Register financing terms for an aggregated order",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/orders/settle": {
+      "post": {
+        "operationId": "RwaController_settle",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerSettlementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregatedOrderResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Trigger settlement when contract conditions are met",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/orders/repayment": {
+      "post": {
+        "operationId": "RwaController_recordRepayment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordRepaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregatedOrderResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Record one repayment event for an order",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/orders/bridge": {
+      "post": {
+        "operationId": "RwaController_prepareBridge",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrepareBridgeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregatedOrderResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Prepare order asset for bridge interoperability to public Avalanche",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/orders": {
+      "get": {
+        "operationId": "RwaController_listOrders",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AggregatedOrderResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List all aggregated orders",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/orders/{orderId}": {
+      "get": {
+        "operationId": "RwaController_getOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregatedOrderResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get one aggregated order by id",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/status": {
+      "get": {
+        "operationId": "RwaController_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RwaLifecycleStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get global lifecycle metrics",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/logs": {
+      "get": {
+        "operationId": "RwaController_logs",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 200,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RwaLogEntryResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recent RWA lifecycle logs",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/logs/stream": {
+      "get": {
+        "operationId": "RwaController_streamLogs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "SSE stream of RWA log entries"
+          }
+        },
+        "summary": "Stream RWA logs with Server-Sent Events",
+        "tags": ["rwa"]
+      }
+    }
+  },
+  "info": {
+    "title": "Aleph RWA Procurement API",
+    "description": "Backend API for permissioned procurement pools, aggregated order tokenization, financing lifecycle, and bridge preparation on Avalanche L1.",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "rwa",
+      "description": ""
+    },
+    {
+      "name": "auth",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "SignupEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "retailer@shop.com"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Retail Partner One"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["retailer", "supplier"],
+            "example": "retailer"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongPassword!123"
+          }
+        },
+        "required": ["email", "fullName", "role", "password"]
+      },
+      "WalletResponseDto": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "type": "string",
+            "example": "fuji"
+          },
+          "chainId": {
+            "type": "number",
+            "example": 43113
+          },
+          "rpcUrl": {
+            "type": "string",
+            "example": "https://api.avax-test.network/ext/bc/C/rpc"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
+          },
+          "publicKey": {
+            "type": "string",
+            "example": "0x04f355bdcb7cc0af728ef3cceb9615d90684bb5f0ea7f4f1c0d5f0fd14735f4f83f6d4f2c68f5b26d3f127f4cc13a6b0446dcf8f5e8f138f739b6b4f4d3b6635c4"
+          }
+        },
+        "required": ["network", "chainId", "rpcUrl", "address", "publicKey"]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "usr-kz6r9n2m"
+          },
+          "email": {
+            "type": "string",
+            "example": "retailer@shop.com"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Retail Partner One"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["retailer", "supplier"],
+            "example": "retailer"
+          },
+          "provider": {
+            "type": "string",
+            "enum": ["email", "google"],
+            "example": "email"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/WalletResponseDto"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-03-22T12:10:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "fullName",
+          "role",
+          "provider",
+          "wallet",
+          "createdAt"
+        ]
+      },
+      "AuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3Ita3o2cjluMm0iLCJlbWFpbCI6InJldGFpbGVyQHNob3AuY29tIiwicm9sZSI6InJldGFpbGVyIiwiaWF0IjoxNzExMTAwMDAwLCJleHAiOjE3MTExMDcyMDB9.signature"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponseDto"
+          }
+        },
+        "required": ["accessToken", "user"]
+      },
+      "LoginEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "retailer@shop.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongPassword!123"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "SignupGoogleDto": {
+        "type": "object",
+        "properties": {
+          "idToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ij...google-id-token...",
+            "description": "Google ID token from frontend OAuth flow"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["retailer", "supplier"],
+            "example": "supplier"
+          }
+        },
+        "required": ["idToken", "role"]
+      },
+      "LoginGoogleDto": {
+        "type": "object",
+        "properties": {
+          "idToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ij...google-id-token...",
+            "description": "Google ID token from frontend OAuth flow"
+          }
+        },
+        "required": ["idToken"]
+      },
+      "VerifyMerchantDto": {
+        "type": "object",
+        "properties": {
+          "merchantId": {
+            "type": "string",
+            "example": "merchant-001"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "Retailer ABC Ltd."
+          },
+          "jurisdiction": {
+            "type": "string",
+            "example": "MX"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "taxId": "ABCD123",
+              "businessType": "grocery"
+            }
+          }
+        },
+        "required": ["merchantId", "legalName", "jurisdiction"]
+      },
+      "MerchantProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchantId": {
+            "type": "string",
+            "example": "merchant-001"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "Retailer ABC Ltd."
+          },
+          "jurisdiction": {
+            "type": "string",
+            "example": "MX"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "verified", "rejected"],
+            "example": "verified"
+          },
+          "verifiedAt": {
+            "type": "string",
+            "example": "2026-03-21T19:10:30.000Z"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": ["merchantId", "legalName", "jurisdiction", "status"]
+      },
+      "CreatePoolDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "North Zone Q2 Procurement Pool"
+          },
+          "allowedMerchants": {
+            "example": ["merchant-001", "merchant-002"],
+            "description": "Permissioned merchant IDs allowed to participate in the pool",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name", "allowedMerchants"]
+      },
+      "PurchasePoolResponseDto": {
+        "type": "object",
+        "properties": {
+          "poolId": {
+            "type": "string",
+            "example": "pool-1711032191000-q9s9p2mz"
+          },
+          "name": {
+            "type": "string",
+            "example": "North Zone Q2 Procurement Pool"
+          },
+          "permissioned": {
+            "type": "boolean",
+            "example": true
+          },
+          "allowedMerchants": {
+            "example": ["merchant-001", "merchant-002"],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-03-21T20:05:11.000Z"
+          },
+          "chainPoolAddress": {
+            "type": "string",
+            "example": "pool-44d8ca89d2b19b8a"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "open", "committed", "funded", "settled"],
+            "example": "open"
+          }
+        },
+        "required": [
+          "poolId",
+          "name",
+          "permissioned",
+          "allowedMerchants",
+          "createdAt",
+          "status"
+        ]
+      },
+      "CommitOrderDto": {
+        "type": "object",
+        "properties": {
+          "poolId": {
+            "type": "string",
+            "example": "pool-1711032191000-q9s9p2mz"
+          },
+          "merchantId": {
+            "type": "string",
+            "example": "merchant-001"
+          },
+          "sku": {
+            "type": "string",
+            "example": "cooking-oil-5l"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 120
+          },
+          "unitPrice": {
+            "type": "number",
+            "example": 18.75
+          },
+          "notes": {
+            "type": "string",
+            "example": "Need delivery before next Friday"
+          }
+        },
+        "required": ["poolId", "merchantId", "sku", "quantity", "unitPrice"]
+      },
+      "MerchantOrderCommitmentResponseDto": {
+        "type": "object",
+        "properties": {
+          "commitmentId": {
+            "type": "string",
+            "example": "commitment-1711032287440-v3g2f8qk"
+          },
+          "poolId": {
+            "type": "string",
+            "example": "pool-1711032191000-q9s9p2mz"
+          },
+          "merchantId": {
+            "type": "string",
+            "example": "merchant-001"
+          },
+          "sku": {
+            "type": "string",
+            "example": "cooking-oil-5l"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 120
+          },
+          "unitPrice": {
+            "type": "number",
+            "example": 18.75
+          },
+          "encryptedPayload": {
+            "type": "string",
+            "example": "AQQ4oB6h4NbcY2U..."
+          },
+          "hash": {
+            "type": "string",
+            "example": "a5850f2e6c11f99d8b4f91fb8fcb4e74cc4385dc323f928456fca2d2b49d53ab"
+          },
+          "committedAt": {
+            "type": "string",
+            "example": "2026-03-21T20:12:00.000Z"
+          }
+        },
+        "required": [
+          "commitmentId",
+          "poolId",
+          "merchantId",
+          "sku",
+          "quantity",
+          "unitPrice",
+          "encryptedPayload",
+          "hash",
+          "committedAt"
+        ]
+      },
+      "AggregateOrderDto": {
+        "type": "object",
+        "properties": {
+          "poolId": {
+            "type": "string",
+            "example": "pool-1711032191000-q9s9p2mz"
+          }
+        },
+        "required": ["poolId"]
+      },
+      "TokenizationRecordDto": {
+        "type": "object",
+        "properties": {
+          "entitlementTokenId": {
+            "type": "string",
+            "example": "ent-18f9a35a476f8575"
+          },
+          "repaymentTokenId": {
+            "type": "string",
+            "example": "rep-74ba5732ba6f2a2d"
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0x8e78a1f07a66d4a18e2d2ff1f97f6fdb8bd38c302618b81ee497df396a0508f1"
+          },
+          "tokenizedAt": {
+            "type": "string",
+            "example": "2026-03-21T21:19:25.000Z"
+          }
+        },
+        "required": [
+          "entitlementTokenId",
+          "repaymentTokenId",
+          "txHash",
+          "tokenizedAt"
+        ]
+      },
+      "FinancingRecordDto": {
+        "type": "object",
+        "properties": {
+          "financierId": {
+            "type": "string",
+            "example": "supplier-credit-desk-01"
+          },
+          "amount": {
+            "type": "number",
+            "example": 125000.5
+          },
+          "annualizedRateBps": {
+            "type": "number",
+            "example": 1450
+          },
+          "tenorDays": {
+            "type": "number",
+            "example": 45
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0x5f8e4b5dc9e845f7f73b0b8a43c77b4f5f604f5078b25d7f8114bf3f4a26e0a2"
+          },
+          "fundedAt": {
+            "type": "string",
+            "example": "2026-03-21T21:30:12.000Z"
+          }
+        },
+        "required": [
+          "financierId",
+          "amount",
+          "annualizedRateBps",
+          "tenorDays",
+          "txHash",
+          "fundedAt"
+        ]
+      },
+      "SettlementRecordDto": {
+        "type": "object",
+        "properties": {
+          "conditionRef": {
+            "type": "string",
+            "example": "delivery-confirmed-and-invoice-matched"
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0x816f43c1f8bb99f7d99e50b8ce8c341e09d11fffd947cc10fef571f782244177"
+          },
+          "settledAt": {
+            "type": "string",
+            "example": "2026-03-21T22:10:50.000Z"
+          }
+        },
+        "required": ["conditionRef", "txHash", "settledAt"]
+      },
+      "RepaymentRecordDto": {
+        "type": "object",
+        "properties": {
+          "repaymentId": {
+            "type": "string",
+            "example": "repayment-1711033443000-51d2j0m2"
+          },
+          "amount": {
+            "type": "number",
+            "example": 25000
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0x9c02f0410ec6ca65535ff82011be2f66a8495f07d6203ebca342b266e7d7beec"
+          },
+          "paidAt": {
+            "type": "string",
+            "example": "2026-03-22T08:20:10.000Z"
+          }
+        },
+        "required": ["repaymentId", "amount", "txHash", "paidAt"]
+      },
+      "BridgePreparationDto": {
+        "type": "object",
+        "properties": {
+          "targetNetwork": {
+            "type": "string",
+            "enum": ["avalanche-mainnet", "avalanche-fuji"],
+            "example": "avalanche-fuji"
+          },
+          "bridgeAssetId": {
+            "type": "string",
+            "example": "bridge-7ffb4a20f3702b1b"
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0x260c7ef0eef0c8dbe65ea76190f8ec816f9efe8dca8e0e08df6f13f2c87f5f18"
+          },
+          "preparedAt": {
+            "type": "string",
+            "example": "2026-03-22T10:14:32.000Z"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": ["targetNetwork", "bridgeAssetId", "txHash", "preparedAt"]
+      },
+      "AggregatedOrderResponseDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "order-1711033191000-y2d4l8pr"
+          },
+          "poolId": {
+            "type": "string",
+            "example": "pool-1711032191000-q9s9p2mz"
+          },
+          "totalQuantity": {
+            "type": "number",
+            "example": 860
+          },
+          "weightedUnitPrice": {
+            "type": "number",
+            "example": 19.2
+          },
+          "totalNotional": {
+            "type": "number",
+            "example": 16512
+          },
+          "participatingMerchants": {
+            "type": "number",
+            "example": 4
+          },
+          "commitmentIds": {
+            "example": ["commitment-1", "commitment-2"],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "collecting",
+              "structured",
+              "tokenized",
+              "funded",
+              "settled",
+              "in_repayment",
+              "repaid"
+            ],
+            "example": "structured"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-03-21T20:25:00.000Z"
+          },
+          "tokenization": {
+            "$ref": "#/components/schemas/TokenizationRecordDto"
+          },
+          "financing": {
+            "$ref": "#/components/schemas/FinancingRecordDto"
+          },
+          "settlement": {
+            "$ref": "#/components/schemas/SettlementRecordDto"
+          },
+          "repayments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RepaymentRecordDto"
+            }
+          },
+          "bridgePreparation": {
+            "$ref": "#/components/schemas/BridgePreparationDto"
+          }
+        },
+        "required": [
+          "orderId",
+          "poolId",
+          "totalQuantity",
+          "weightedUnitPrice",
+          "totalNotional",
+          "participatingMerchants",
+          "commitmentIds",
+          "status",
+          "createdAt",
+          "repayments"
+        ]
+      },
+      "TokenizeOrderDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "order-1711033191000-y2d4l8pr"
+          }
+        },
+        "required": ["orderId"]
+      },
+      "FinanceOrderDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "order-1711033191000-y2d4l8pr"
+          },
+          "financierId": {
+            "type": "string",
+            "example": "supplier-credit-desk-01"
+          },
+          "amount": {
+            "type": "number",
+            "example": 125000.5
+          },
+          "annualizedRateBps": {
+            "type": "number",
+            "example": 1450,
+            "description": "Annualized financing rate in basis points"
+          },
+          "tenorDays": {
+            "type": "number",
+            "example": 45
+          }
+        },
+        "required": [
+          "orderId",
+          "financierId",
+          "amount",
+          "annualizedRateBps",
+          "tenorDays"
+        ]
+      },
+      "TriggerSettlementDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "order-1711033191000-y2d4l8pr"
+          },
+          "conditionRef": {
+            "type": "string",
+            "example": "delivery-confirmed-and-invoice-matched"
+          }
+        },
+        "required": ["orderId", "conditionRef"]
+      },
+      "RecordRepaymentDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "order-1711033191000-y2d4l8pr"
+          },
+          "amount": {
+            "type": "number",
+            "example": 25000
+          }
+        },
+        "required": ["orderId", "amount"]
+      },
+      "PrepareBridgeDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "order-1711033191000-y2d4l8pr"
+          },
+          "targetNetwork": {
+            "type": "string",
+            "enum": ["avalanche-mainnet", "avalanche-fuji"],
+            "example": "avalanche-fuji"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "purpose": "external-liquidity-window",
+              "tranche": "A"
+            }
+          }
+        },
+        "required": ["orderId", "targetNetwork"]
+      },
+      "RwaLifecycleStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "pools": {
+            "type": "number",
+            "example": 2
+          },
+          "verifiedMerchants": {
+            "type": "number",
+            "example": 8
+          },
+          "aggregatedOrders": {
+            "type": "number",
+            "example": 4
+          },
+          "fundedOrders": {
+            "type": "number",
+            "example": 3
+          },
+          "settledOrders": {
+            "type": "number",
+            "example": 2
+          },
+          "repaidOrders": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "pools",
+          "verifiedMerchants",
+          "aggregatedOrders",
+          "fundedOrders",
+          "settledOrders",
+          "repaidOrders"
+        ]
+      },
+      "RwaLogEntryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1711034077842-yg91n4wz"
+          },
+          "at": {
+            "type": "string",
+            "example": "2026-03-22T10:18:35.842Z"
+          },
+          "level": {
+            "type": "string",
+            "enum": ["info", "warn", "error"],
+            "example": "info"
+          },
+          "event": {
+            "type": "string",
+            "example": "order.bridge.prepared"
+          },
+          "context": {
+            "type": "object"
+          }
+        },
+        "required": ["id", "at", "level", "event"]
+      }
+    }
+  }
+}

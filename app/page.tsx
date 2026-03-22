@@ -18,13 +18,13 @@ export default function Home() {
           </p>
           <div className="flex flex-col gap-3 pt-1 sm:flex-row">
             <a
-              href="#"
+              href="/auth/retailer"
               className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:-translate-y-0.5 hover:bg-slate-800"
             >
               Join as Retailer
             </a>
             <a
-              href="#"
+              href="/auth/supplier"
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-400"
             >
               Join as Supplier
