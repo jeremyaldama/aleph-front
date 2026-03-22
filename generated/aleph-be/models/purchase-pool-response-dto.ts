@@ -22,6 +22,7 @@ export interface PurchasePoolResponseDto {
     'createdAt': string;
     'chainPoolAddress'?: string;
     'status': PurchasePoolResponseDtoStatusEnum;
+    'thresholdQuantity': number;
 }
 
 export const PurchasePoolResponseDtoStatusEnum = {

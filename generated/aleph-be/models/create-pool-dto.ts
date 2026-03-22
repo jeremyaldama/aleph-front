@@ -17,6 +17,10 @@
 export interface CreatePoolDto {
     'name': string;
     /**
+     * Minimum aggregated quantity required before the pool can be aggregated into an order
+     */
+    'thresholdQuantity'?: number;
+    /**
      * Permissioned merchant IDs allowed to participate in the pool
      */
     'allowedMerchants': Array<string>;

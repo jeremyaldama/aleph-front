@@ -14,15 +14,12 @@
 
 
 
-export interface CommitOrderDto {
+export interface PoolProgressResponseDto {
     'poolId': string;
-    /**
-     * Optional merchant ID override. If omitted, backend uses authenticated user id.
-     */
-    'merchantId'?: string;
-    'sku': string;
-    'quantity': number;
-    'unitPrice': number;
-    'notes'?: string;
+    'thresholdQuantity': number;
+    'committedQuantity': number;
+    'participatingMerchants': number;
+    'canAggregate': boolean;
+    'missingQuantity': number;
 }
 

@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **poolId** | **string** |  | [default to undefined]
-**merchantId** | **string** |  | [default to undefined]
+**merchantId** | **string** | Optional merchant ID override. If omitted, backend uses authenticated user id. | [optional] [default to undefined]
 **sku** | **string** |  | [default to undefined]
 **quantity** | **number** |  | [default to undefined]
 **unitPrice** | **number** |  | [default to undefined]

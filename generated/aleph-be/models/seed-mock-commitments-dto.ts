@@ -14,15 +14,18 @@
 
 
 
-export interface CommitOrderDto {
-    'poolId': string;
+export interface SeedMockCommitmentsDto {
     /**
-     * Optional merchant ID override. If omitted, backend uses authenticated user id.
+     * Merchant IDs to generate one mock commitment each. Defaults to pool participants when omitted.
      */
-    'merchantId'?: string;
-    'sku': string;
-    'quantity': number;
-    'unitPrice': number;
-    'notes'?: string;
+    'merchantIds'?: Array<string>;
+    /**
+     * Quantity assigned to each generated commitment
+     */
+    'quantity'?: number;
+    /**
+     * Unit price assigned to each generated commitment
+     */
+    'unitPrice'?: number;
 }
 

@@ -245,8 +245,77 @@
         "tags": ["rwa"]
       }
     },
+    "/rwa/pools/{poolId}/progress": {
+      "get": {
+        "operationId": "RwaController_getPoolProgress",
+        "parameters": [
+          {
+            "name": "poolId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolProgressResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get pool commitment progress against aggregation threshold",
+        "tags": ["rwa"]
+      }
+    },
+    "/rwa/dev/pools/{poolId}/mock-commitments": {
+      "post": {
+        "description": "Non-production helper endpoint to rapidly create realistic commitment volume for demos and UI testing.",
+        "operationId": "RwaController_seedMockCommitments",
+        "parameters": [
+          {
+            "name": "poolId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedMockCommitmentsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MerchantOrderCommitmentResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Dev-only: seed one mock commitment per merchant for a pool",
+        "tags": ["rwa"]
+      }
+    },
     "/rwa/commitments": {
       "post": {
+        "description": "Authenticated retailer flow. If merchantId is omitted, backend uses the current user id from bearer token.",
         "operationId": "RwaController_commitOrder",
         "parameters": [],
         "requestBody": {
@@ -269,6 +338,7 @@
             }
           }
         },
+        "security": [{ "bearer": [] }],
         "summary": "Commit encrypted merchant order details into a pool",
         "tags": ["rwa"]
       }
@@ -787,6 +857,11 @@
             "type": "string",
             "example": "North Zone Q2 Procurement Pool"
           },
+          "thresholdQuantity": {
+            "type": "number",
+            "example": 500,
+            "description": "Minimum aggregated quantity required before the pool can be aggregated into an order"
+          },
           "allowedMerchants": {
             "example": ["merchant-001", "merchant-002"],
             "description": "Permissioned merchant IDs allowed to participate in the pool",
@@ -825,7 +900,8 @@
             "type": "string",
             "enum": ["draft", "open", "committed", "funded", "settled"],
             "example": "open"
-          }
+          },
+          "thresholdQuantity": { "type": "number", "example": 500 }
         },
         "required": [
           "poolId",
@@ -833,26 +909,52 @@
           "permissioned",
           "allowedMerchants",
           "createdAt",
-          "status"
+          "status",
+          "thresholdQuantity"
         ]
       },
-      "CommitOrderDto": {
+      "PoolProgressResponseDto": {
         "type": "object",
         "properties": {
           "poolId": {
             "type": "string",
             "example": "pool-1711032191000-q9s9p2mz"
           },
-          "merchantId": { "type": "string", "example": "merchant-001" },
-          "sku": { "type": "string", "example": "cooking-oil-5l" },
-          "quantity": { "type": "number", "example": 120 },
-          "unitPrice": { "type": "number", "example": 18.75 },
-          "notes": {
-            "type": "string",
-            "example": "Need delivery before next Friday"
-          }
+          "thresholdQuantity": { "type": "number", "example": 500 },
+          "committedQuantity": { "type": "number", "example": 360 },
+          "participatingMerchants": { "type": "number", "example": 3 },
+          "canAggregate": { "type": "boolean", "example": false },
+          "missingQuantity": { "type": "number", "example": 140 }
         },
-        "required": ["poolId", "merchantId", "sku", "quantity", "unitPrice"]
+        "required": [
+          "poolId",
+          "thresholdQuantity",
+          "committedQuantity",
+          "participatingMerchants",
+          "canAggregate",
+          "missingQuantity"
+        ]
+      },
+      "SeedMockCommitmentsDto": {
+        "type": "object",
+        "properties": {
+          "merchantIds": {
+            "example": ["merchant-201", "merchant-309", "merchant-441"],
+            "description": "Merchant IDs to generate one mock commitment each. Defaults to pool participants when omitted.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "quantity": {
+            "type": "number",
+            "example": 120,
+            "description": "Quantity assigned to each generated commitment"
+          },
+          "unitPrice": {
+            "type": "number",
+            "example": 18.5,
+            "description": "Unit price assigned to each generated commitment"
+          }
+        }
       },
       "MerchantOrderCommitmentResponseDto": {
         "type": "object",
@@ -893,6 +995,28 @@
           "hash",
           "committedAt"
         ]
+      },
+      "CommitOrderDto": {
+        "type": "object",
+        "properties": {
+          "poolId": {
+            "type": "string",
+            "example": "pool-1711032191000-q9s9p2mz"
+          },
+          "merchantId": {
+            "type": "string",
+            "example": "merchant-001",
+            "description": "Optional merchant ID override. If omitted, backend uses authenticated user id."
+          },
+          "sku": { "type": "string", "example": "cooking-oil-5l" },
+          "quantity": { "type": "number", "example": 120 },
+          "unitPrice": { "type": "number", "example": 18.75 },
+          "notes": {
+            "type": "string",
+            "example": "Need delivery before next Friday"
+          }
+        },
+        "required": ["poolId", "sku", "quantity", "unitPrice"]
       },
       "AggregateOrderDto": {
         "type": "object",

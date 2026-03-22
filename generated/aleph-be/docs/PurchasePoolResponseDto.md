@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **createdAt** | **string** |  | [default to undefined]
 **chainPoolAddress** | **string** |  | [optional] [default to undefined]
 **status** | **string** |  | [default to undefined]
+**thresholdQuantity** | **number** |  | [default to undefined]
 
 ## Example
 
@@ -26,6 +27,7 @@ const instance: PurchasePoolResponseDto = {
     createdAt,
     chainPoolAddress,
     status,
+    thresholdQuantity,
 };
 ```
 

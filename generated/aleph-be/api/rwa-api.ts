@@ -36,6 +36,8 @@ import type { MerchantOrderCommitmentResponseDto } from '../models';
 // @ts-ignore
 import type { MerchantProfileResponseDto } from '../models';
 // @ts-ignore
+import type { PoolProgressResponseDto } from '../models';
+// @ts-ignore
 import type { PrepareBridgeDto } from '../models';
 // @ts-ignore
 import type { PurchasePoolResponseDto } from '../models';
@@ -47,6 +49,8 @@ import type { RetailerDashboardProductsResponseDto } from '../models';
 import type { RwaLifecycleStatusResponseDto } from '../models';
 // @ts-ignore
 import type { RwaLogEntryResponseDto } from '../models';
+// @ts-ignore
+import type { SeedMockCommitmentsDto } from '../models';
 // @ts-ignore
 import type { TokenizeOrderDto } from '../models';
 // @ts-ignore
@@ -94,7 +98,7 @@ export const RwaApiAxiosParamCreator = function (configuration?: Configuration) 
             };
         },
         /**
-         * 
+         * Authenticated retailer flow. If merchantId is omitted, backend uses the current user id from bearer token.
          * @summary Commit encrypted merchant order details into a pool
          * @param {CommitOrderDto} commitOrderDto 
          * @param {*} [options] Override http request option.
@@ -114,6 +118,10 @@ export const RwaApiAxiosParamCreator = function (configuration?: Configuration) 
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             localVarHeaderParameter['Content-Type'] = 'application/json';
             localVarHeaderParameter['Accept'] = 'application/json';
@@ -243,6 +251,40 @@ export const RwaApiAxiosParamCreator = function (configuration?: Configuration) 
             // verify required parameter 'poolId' is not null or undefined
             assertParamExists('rwaControllerGetPool', 'poolId', poolId)
             const localVarPath = `/rwa/pools/{poolId}`
+                .replace(`{${"poolId"}}`, encodeURIComponent(String(poolId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get pool commitment progress against aggregation threshold
+         * @param {string} poolId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rwaControllerGetPoolProgress: async (poolId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'poolId' is not null or undefined
+            assertParamExists('rwaControllerGetPoolProgress', 'poolId', poolId)
+            const localVarPath = `/rwa/pools/{poolId}/progress`
                 .replace(`{${"poolId"}}`, encodeURIComponent(String(poolId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -436,6 +478,43 @@ export const RwaApiAxiosParamCreator = function (configuration?: Configuration) 
             };
         },
         /**
+         * Non-production helper endpoint to rapidly create realistic commitment volume for demos and UI testing.
+         * @summary Dev-only: seed one mock commitment per merchant for a pool
+         * @param {string} poolId 
+         * @param {SeedMockCommitmentsDto} [seedMockCommitmentsDto] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rwaControllerSeedMockCommitments: async (poolId: string, seedMockCommitmentsDto?: SeedMockCommitmentsDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'poolId' is not null or undefined
+            assertParamExists('rwaControllerSeedMockCommitments', 'poolId', poolId)
+            const localVarPath = `/rwa/dev/pools/{poolId}/mock-commitments`
+                .replace(`{${"poolId"}}`, encodeURIComponent(String(poolId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(seedMockCommitmentsDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Trigger settlement when contract conditions are met
          * @param {TriggerSettlementDto} triggerSettlementDto 
@@ -622,7 +701,7 @@ export const RwaApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
+         * Authenticated retailer flow. If merchantId is omitted, backend uses the current user id from bearer token.
          * @summary Commit encrypted merchant order details into a pool
          * @param {CommitOrderDto} commitOrderDto 
          * @param {*} [options] Override http request option.
@@ -687,6 +766,19 @@ export const RwaApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary Get pool commitment progress against aggregation threshold
+         * @param {string} poolId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rwaControllerGetPoolProgress(poolId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PoolProgressResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rwaControllerGetPoolProgress(poolId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RwaApi.rwaControllerGetPoolProgress']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.
          * @summary Retailer dashboard first page: list products (mocked)
          * @param {*} [options] Override http request option.
@@ -747,6 +839,20 @@ export const RwaApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rwaControllerRecordRepayment(recordRepaymentDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RwaApi.rwaControllerRecordRepayment']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Non-production helper endpoint to rapidly create realistic commitment volume for demos and UI testing.
+         * @summary Dev-only: seed one mock commitment per merchant for a pool
+         * @param {string} poolId 
+         * @param {SeedMockCommitmentsDto} [seedMockCommitmentsDto] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rwaControllerSeedMockCommitments(poolId: string, seedMockCommitmentsDto?: SeedMockCommitmentsDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MerchantOrderCommitmentResponseDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rwaControllerSeedMockCommitments(poolId, seedMockCommitmentsDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RwaApi.rwaControllerSeedMockCommitments']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -832,7 +938,7 @@ export const RwaApiFactory = function (configuration?: Configuration, basePath?:
             return localVarFp.rwaControllerAggregate(aggregateOrderDto, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Authenticated retailer flow. If merchantId is omitted, backend uses the current user id from bearer token.
          * @summary Commit encrypted merchant order details into a pool
          * @param {CommitOrderDto} commitOrderDto 
          * @param {*} [options] Override http request option.
@@ -882,6 +988,16 @@ export const RwaApiFactory = function (configuration?: Configuration, basePath?:
             return localVarFp.rwaControllerGetPool(poolId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary Get pool commitment progress against aggregation threshold
+         * @param {string} poolId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rwaControllerGetPoolProgress(poolId: string, options?: RawAxiosRequestConfig): AxiosPromise<PoolProgressResponseDto> {
+            return localVarFp.rwaControllerGetPoolProgress(poolId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.
          * @summary Retailer dashboard first page: list products (mocked)
          * @param {*} [options] Override http request option.
@@ -928,6 +1044,17 @@ export const RwaApiFactory = function (configuration?: Configuration, basePath?:
          */
         rwaControllerRecordRepayment(recordRepaymentDto: RecordRepaymentDto, options?: RawAxiosRequestConfig): AxiosPromise<AggregatedOrderResponseDto> {
             return localVarFp.rwaControllerRecordRepayment(recordRepaymentDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Non-production helper endpoint to rapidly create realistic commitment volume for demos and UI testing.
+         * @summary Dev-only: seed one mock commitment per merchant for a pool
+         * @param {string} poolId 
+         * @param {SeedMockCommitmentsDto} [seedMockCommitmentsDto] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rwaControllerSeedMockCommitments(poolId: string, seedMockCommitmentsDto?: SeedMockCommitmentsDto, options?: RawAxiosRequestConfig): AxiosPromise<Array<MerchantOrderCommitmentResponseDto>> {
+            return localVarFp.rwaControllerSeedMockCommitments(poolId, seedMockCommitmentsDto, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -996,7 +1123,7 @@ export class RwaApi extends BaseAPI {
     }
 
     /**
-     * 
+     * Authenticated retailer flow. If merchantId is omitted, backend uses the current user id from bearer token.
      * @summary Commit encrypted merchant order details into a pool
      * @param {CommitOrderDto} commitOrderDto 
      * @param {*} [options] Override http request option.
@@ -1051,6 +1178,17 @@ export class RwaApi extends BaseAPI {
     }
 
     /**
+     * 
+     * @summary Get pool commitment progress against aggregation threshold
+     * @param {string} poolId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public rwaControllerGetPoolProgress(poolId: string, options?: RawAxiosRequestConfig) {
+        return RwaApiFp(this.configuration).rwaControllerGetPoolProgress(poolId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Core userflow: after retailer login/signup, call this endpoint to render the first dashboard page with products available to the retailer. Data is mocked for now.
      * @summary Retailer dashboard first page: list products (mocked)
      * @param {*} [options] Override http request option.
@@ -1101,6 +1239,18 @@ export class RwaApi extends BaseAPI {
      */
     public rwaControllerRecordRepayment(recordRepaymentDto: RecordRepaymentDto, options?: RawAxiosRequestConfig) {
         return RwaApiFp(this.configuration).rwaControllerRecordRepayment(recordRepaymentDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Non-production helper endpoint to rapidly create realistic commitment volume for demos and UI testing.
+     * @summary Dev-only: seed one mock commitment per merchant for a pool
+     * @param {string} poolId 
+     * @param {SeedMockCommitmentsDto} [seedMockCommitmentsDto] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public rwaControllerSeedMockCommitments(poolId: string, seedMockCommitmentsDto?: SeedMockCommitmentsDto, options?: RawAxiosRequestConfig) {
+        return RwaApiFp(this.configuration).rwaControllerSeedMockCommitments(poolId, seedMockCommitmentsDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

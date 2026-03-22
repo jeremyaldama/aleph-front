@@ -10,11 +10,13 @@ All URIs are relative to *http://localhost*
 |[**rwaControllerFinance**](#rwacontrollerfinance) | **POST** /rwa/orders/finance | Register financing terms for an aggregated order|
 |[**rwaControllerGetOrder**](#rwacontrollergetorder) | **GET** /rwa/orders/{orderId} | Get one aggregated order by id|
 |[**rwaControllerGetPool**](#rwacontrollergetpool) | **GET** /rwa/pools/{poolId} | Get one purchase pool by id|
+|[**rwaControllerGetPoolProgress**](#rwacontrollergetpoolprogress) | **GET** /rwa/pools/{poolId}/progress | Get pool commitment progress against aggregation threshold|
 |[**rwaControllerGetRetailerDashboardProducts**](#rwacontrollergetretailerdashboardproducts) | **GET** /rwa/retailer/products | Retailer dashboard first page: list products (mocked)|
 |[**rwaControllerListOrders**](#rwacontrollerlistorders) | **GET** /rwa/orders | List all aggregated orders|
 |[**rwaControllerLogs**](#rwacontrollerlogs) | **GET** /rwa/logs | Get recent RWA lifecycle logs|
 |[**rwaControllerPrepareBridge**](#rwacontrollerpreparebridge) | **POST** /rwa/orders/bridge | Prepare order asset for bridge interoperability to public Avalanche|
 |[**rwaControllerRecordRepayment**](#rwacontrollerrecordrepayment) | **POST** /rwa/orders/repayment | Record one repayment event for an order|
+|[**rwaControllerSeedMockCommitments**](#rwacontrollerseedmockcommitments) | **POST** /rwa/dev/pools/{poolId}/mock-commitments | Dev-only: seed one mock commitment per merchant for a pool|
 |[**rwaControllerSettle**](#rwacontrollersettle) | **POST** /rwa/orders/settle | Trigger settlement when contract conditions are met|
 |[**rwaControllerStatus**](#rwacontrollerstatus) | **GET** /rwa/status | Get global lifecycle metrics|
 |[**rwaControllerStreamLogs**](#rwacontrollerstreamlogs) | **GET** /rwa/logs/stream | Stream RWA logs with Server-Sent Events|
@@ -75,6 +77,7 @@ No authorization required
 # **rwaControllerCommitOrder**
 > MerchantOrderCommitmentResponseDto rwaControllerCommitOrder(commitOrderDto)
 
+Authenticated retailer flow. If merchantId is omitted, backend uses the current user id from bearer token.
 
 ### Example
 
@@ -108,7 +111,7 @@ const { status, data } = await apiInstance.rwaControllerCommitOrder(
 
 ### Authorization
 
-No authorization required
+[bearer](../README.md#bearer)
 
 ### HTTP request headers
 
@@ -307,6 +310,56 @@ const { status, data } = await apiInstance.rwaControllerGetPool(
 ### Return type
 
 **PurchasePoolResponseDto**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** |  |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **rwaControllerGetPoolProgress**
+> PoolProgressResponseDto rwaControllerGetPoolProgress()
+
+
+### Example
+
+```typescript
+import {
+    RwaApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RwaApi(configuration);
+
+let poolId: string; // (default to undefined)
+
+const { status, data } = await apiInstance.rwaControllerGetPoolProgress(
+    poolId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **poolId** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**PoolProgressResponseDto**
 
 ### Authorization
 
@@ -546,6 +599,61 @@ const { status, data } = await apiInstance.rwaControllerRecordRepayment(
 ### Return type
 
 **AggregatedOrderResponseDto**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** |  |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **rwaControllerSeedMockCommitments**
+> Array<MerchantOrderCommitmentResponseDto> rwaControllerSeedMockCommitments()
+
+Non-production helper endpoint to rapidly create realistic commitment volume for demos and UI testing.
+
+### Example
+
+```typescript
+import {
+    RwaApi,
+    Configuration,
+    SeedMockCommitmentsDto
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RwaApi(configuration);
+
+let poolId: string; // (default to undefined)
+let seedMockCommitmentsDto: SeedMockCommitmentsDto; // (optional)
+
+const { status, data } = await apiInstance.rwaControllerSeedMockCommitments(
+    poolId,
+    seedMockCommitmentsDto
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **seedMockCommitmentsDto** | **SeedMockCommitmentsDto**|  | |
+| **poolId** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**Array<MerchantOrderCommitmentResponseDto>**
 
 ### Authorization
 
