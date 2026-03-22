@@ -5,8 +5,8 @@ export default function Home() {
 
       <section className="relative mx-auto grid w-full max-w-6xl gap-12 px-6 pb-20 pt-18 lg:grid-cols-[1fr_0.95fr] lg:px-10 lg:pt-24">
         <div className="space-y-7">
-          <p className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600 shadow-sm">
-            Bodega Gente Platform
+          <p className="inline-flex rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.16em] text-slate-600 shadow-sm">
+            Bodegagentic Platform
           </p>
           <h1 className="max-w-xl text-5xl font-semibold tracking-tight text-slate-950 sm:text-6xl">
             Buy Smarter Together

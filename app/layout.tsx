@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bodega Gente | Coordinated Procurement",
+  title: "Bodegagentic | Coordinated Procurement",
   description:
-    "Bodega Gente helps retailers and suppliers coordinate demand, tokenize inventory, and unlock institutional pricing.",
+    "Bodegagentic helps retailers and suppliers coordinate demand, tokenize inventory, and unlock institutional pricing.",
 };
 
 export default function RootLayout({

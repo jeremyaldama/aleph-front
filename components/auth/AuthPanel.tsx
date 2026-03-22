@@ -226,7 +226,7 @@ export default function AuthPanel({ role }: AuthPanelProps) {
             onChange={(event) => setEmail(event.target.value)}
             required
             className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-sky-500"
-            placeholder="you@bodegagente.com"
+            placeholder="you@bodegagentic.com"
           />
         </div>
 

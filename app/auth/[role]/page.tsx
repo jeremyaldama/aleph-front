@@ -27,8 +27,8 @@ export default async function AuthRolePage({ params }: AuthPageProps) {
 
       <section className="relative mx-auto grid w-full max-w-6xl gap-8 px-6 pb-16 pt-14 lg:grid-cols-[1fr_1.1fr] lg:px-10">
         <div className="space-y-6">
-          <p className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-600 shadow-sm">
-            Bodega Gente Onboarding
+          <p className="inline-flex rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.12em] text-slate-600 shadow-sm">
+            Bodegagentic Onboarding
           </p>
 
           <h1 className="text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
